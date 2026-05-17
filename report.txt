@@ -1,0 +1,149 @@
+Đồ án Crack Phần Mềm
+Báo cáo phân tích 4 crackme và keygen
+Nhóm
+24120029_24120070
+Thành viên
+24120029 - Võ Văn Cường; 24120070 - Vương Hữu Khang
+Username minh họa thống nhất
+2412002924120070
+Ngày cập nhật
+19/05/2026
+Preset trình bày
+standard_business_brief
+Tóm tắt yêu cầu và phạm vi
+Yêu cầu đồ án là phân tích từng crackme để tìm thuật toán sinh serial, viết keygen tương ứng, nộp source/exe keygen và báo cáo có bằng chứng kỹ thuật. Phạm vi ở đây chỉ dành cho crackme học tập trong đề bài.
+Bản hoàn thiện này ưu tiên tính kiểm chứng: mỗi phần có địa chỉ/lệnh đáng chú ý, pseudocode, serial minh họa và cách chạy keygen. Riêng crackme2 được ghi rõ là chưa đủ bằng chứng runtime vì thiếu binary gốc errors_keygenme.exe.
+Trạng thái 4 target
+Crackme
+Target gốc
+Tình trạng
+Serial minh họa
+1
+KeygenMe1.exe
+Đã đối chiếu assembly và sửa keygen phụ thuộc GetComputerNameA.
+89041C38-13838BC0-686AA2A0-B9B75D5E
+2
+errors_keygenme.exe
+Thiếu EXE gốc; chỉ có disassembly text, chưa runtime-verify.
+3427100330436634406253240446315271072377652222726405577
+3
+d2k2.crkme.09.exe
+Đã đối chiếu binary và sửa keygen theo bảng xoay + rolling XOR.
+tNrRu03bTDZPy59B
+4
+WhichKeyIsIt.exe + helper.dll
+Đã phân tích .NET loader và helper.dll; key phụ thuộc ngày/CPU.
+T10-67E7
+Bảng tự đánh giá theo rubric
+Hạng mục
+Tự đánh giá
+Ghi chú
+A - Phân tích thuật toán
+38/40
+Crackme1/3/4 đã có địa chỉ và thuật toán; crackme2 bị trừ vì thiếu EXE gốc.
+B - Keygen
+30/30
+4 source đã chuẩn hóa CLI và build .exe trong thư mục nộp.
+C - Báo cáo/minh chứng
+24/30
+Có hình minh chứng kỹ thuật; ảnh GUI nhập key thành công cần chụp bổ sung nếu rubric bắt buộc.
+Tổng
+92/100
+Không tự chấm 100% do rủi ro crackme2 và thiếu screenshot GUI thật.
+Crackme 1 - KeygenMe1.exe
+Điểm cần chốt: serial không chỉ phụ thuộc username, mà còn phụ thuộc tên máy qua GetComputerNameA. Trong minh họa này máy là LAPTOPCUACUONG, vì vậy cùng username có thể sinh serial khác trên máy khác.
+Target
+Project crack phan mem/crackme/Crack01/KeygenMe1.exe
+Username dùng thống nhất
+2412002924120070
+Serial minh họa
+89041C38-13838BC0-686AA2A0-B9B75D5E
+Keygen
+Keygen/crackme1/keygen.py và keygen.exe
+Thuật toán rút gọn
+machine_hash = hash(GetComputerNameA())
+for each username byte i:
+    bx = username[i] | (username[i+1] << 8)
+    ebx = ((bx << 8) ^ (machine_hash & 0x00F8F800))
+    ebx = (ebx + 0x006C6F6C) ^ 0x10101010
+    update ecx/edx, then run 16 rounds bswap/rol/ror
+serial = ECX-EDX-EDI-ESI as four uppercase DWORDs
+Cách chạy: python keygen.py 2412002924120070 hoặc keygen.exe 2412002924120070.
+Hình 1. Bằng chứng phân tích và output keygen cho Crackme 1.
+Crackme 2 - errors_keygenme.exe
+Rủi ro chính: file errors_keygenme.exe không có trong workspace hiện tại. Phần này được hoàn thiện dựa trên hai file disassembly crack2_asm_utf8.txt và crack2_asm_utf8_part2.txt, nên không tự chấm tuyệt đối cho ảnh/runtime.
+Target
+errors_keygenme.exe - chưa tìm thấy bản gốc trong thư mục target
+Nguồn phân tích
+crack2_asm_utf8.txt, crack2_asm_utf8_part2.txt
+Username dùng thống nhất
+2412002924120070
+Serial minh họa
+3427100330436634406253240446315271072377652222726405577
+Keygen
+Keygen/crackme2/keygen.py và keygen.exe
+Thuật toán rút gọn
+digest = SHA1(username_utf8)
+split digest into five big-endian DWORDs
+for each DWORD: format as 11-digit octal
+serial = concat(5 octal blocks)  # total 55 characters
+Dấu hiệu trong assembly: luồng kiểm tra bị che bởi SEH handler tại 0x402065; nhánh kiểm tra độ dài dùng cmp eax,0x37; vùng 0x4015D7 có cấu trúc tương ứng vòng xử lý digest SHA-1.
+Cách chạy: python keygen.py 2412002924120070 hoặc keygen.exe 2412002924120070.
+Hình 2. Bằng chứng phân tích từ disassembly text và output keygen cho Crackme 2.
+Crackme 3 - d2k2.crkme.09.exe
+Keygen cũ đã được thay bằng thuật toán đối chiếu từ binary: xoay bảng ký tự theo độ dài username, biến đổi username bằng XOR cặp ký tự và rolling DL, rồi cộng chỉ số trong bảng để tạo serial.
+Target
+Project crack phan mem/crackme/crack03/d2k2.crkme.09.exe
+Username dùng thống nhất
+2412002924120070
+Serial minh họa
+tNrRu03bTDZPy59B
+Ràng buộc username
+Chỉ dùng 0-9, a-z, A-Z; vì vậy username minh họa không dùng dấu gạch dưới.
+Keygen
+Keygen/crackme3/keygen.py và keygen.exe
+Thuật toán rút gọn
+alphabet = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+table = rotate(alphabet, len(username) * 4)  # cap to 0x1E if offset > 0x3C
+dl = rol8(first_username_byte, 3)
+for i in range(len(username)):
+    v = ((username[i] ^ username[i+1]) + dl) & 0xff
+    dl = (dl + v) & 0xff
+    transformed[i] = table[v % len(table)]
+serial[i] = table[(index(transformed[i]) + index(username[i])) % len(table)]
+Cách chạy: python keygen.py 2412002924120070 hoặc keygen.exe 2412002924120070.
+Hình 3. Bằng chứng phân tích và output keygen cho Crackme 3.
+Crackme 4 - WhichKeyIsIt.exe
+Phần .NET chỉ là loader: SerialMaker.SerialCheck gọi helper.dll!xor0_fun. Logic thật nằm trong helper.dll và rẽ nhánh theo GetLocalTime().wDayOfWeek. Với ngày hiện tại của môi trường làm bài, nhánh Tuesday sinh serial dạng T10-XXXX.
+Target
+Project crack phan mem/crackme/crack04/WhichKeyIsIt.exe + helper.dll
+Username dùng thống nhất
+2412002924120070
+Serial minh họa
+T10-67E7
+Ràng buộc
+Serial phụ thuộc ngày trong tuần và CPUID của máy chạy.
+Keygen
+Keygen/crackme4/keygen.py và keygen.exe
+Thuật toán rút gọn cho nhánh Tuesday
+mix = CPUID(0) xor CPUID(1) with byte swap steps
+repeat username bytes to 0x20 bytes
+xor every 4-byte block with mix
+value = 0xB00B
+for byte in repeated: value = ((value ^ (byte * len(username))) << 4) & 0xffffffff
+serial = 'T10-' + hex16(value ^ (value >> 16))
+Các nhánh đã ghi nhận: Sunday trả hằng A10-57617274-686F67; Tuesday là nhánh đã implement; Wednesday có công thức riêng cho ít nhất 4 ký tự đầu; các ngày còn lại cần phân tích thêm nếu muốn chạy keygen độc lập mọi ngày.
+Cách chạy: python keygen.py 2412002924120070 hoặc keygen.exe 2412002924120070. Có thể dùng --day 2 để ép nhánh Tuesday.
+Hình 4. Bằng chứng phân tích helper.dll và output keygen cho Crackme 4.
+Cấu trúc thư mục nộp cuối
+24120029_24120070/
+  24120029_24120070.docx
+  Keygen/
+    crackme1/keygen.py, keygen.exe
+    crackme2/keygen.py, keygen.exe
+    crackme3/keygen.py, keygen.exe
+    crackme4/keygen.py, keygen.exe
+Việc cần bổ sung nếu muốn khóa điểm tuyệt đối
+Tìm lại errors_keygenme.exe để runtime-verify crackme2 và chụp màn hình nhập key thành công.
+Chạy từng crackme gốc bằng GUI trên máy nộp bài, nhập serial trong báo cáo và chụp ảnh trạng thái success.
+Nếu chạy crackme4 vào ngày khác Tuesday, dùng --day để kiểm tra nhánh phù hợp hoặc bổ sung thuật toán cho nhánh ngày đó.

@@ -55,25 +55,38 @@ def cpu_mix_value() -> int:
 
 
 def generate_tuesday_key(username: str) -> str:
+    # Logic sinh key riêng biệt cho nhánh ngày thứ Ba (Tuesday)
     if not username:
         raise ValueError("Username must not be empty.")
 
     name = username.encode("ascii", errors="strict")
     length = len(name)
+    
+    # Mở rộng username cho đến khi đạt đủ độ dài 0x20 (32 bytes)
     repeated = bytearray(name[index % length] for index in range(0x20))
+    
+    # Lấy giá trị mix đặc trưng dựa trên lệnh CPUID
     mix = cpu_mix_value()
     mix_bytes = mix.to_bytes(4, "little")
 
+    # Duyệt qua từng khối 4 byte (DWORD) của username đã lặp và XOR với giá trị mix CPUID
     for offset in range(0, len(repeated), 4):
         for index in range(4):
             repeated[offset + index] ^= mix_bytes[index]
 
+    # Khởi tạo giá trị seed 0xB00B
     value = 0xB00B
+    # Vòng lặp xử lý 32 bytes để sinh ra giá trị check cuối cùng
     for byte in repeated:
+        # Nhân byte hiện tại với độ dài username gốc
         product = (byte * length) & MASK32
+        # XOR với value cũ rồi dịch trái 4 bit
         value = ((value ^ product) << 4) & MASK32
 
+    # XOR 16 bit thấp và 16 bit cao của kết quả
     value = (value ^ (value >> 16)) & 0xFFFF
+    
+    # Format chuỗi serial thành dạng 'T10-XXXX' cho ngày Tuesday
     return f"T10-{value:04X}"
 
 
@@ -83,15 +96,24 @@ def current_windows_day() -> int:
 
 
 def generate_key(username: str, day: int | None = None) -> str:
+    # Hàm rẽ nhánh tạo serial tùy thuộc vào ngày trong tuần (GetLocalTime)
     selected_day = current_windows_day() if day is None else day
+    
+    # Sunday: Luôn trả về 1 chuỗi cố định
     if selected_day == 0:
         return "A10-57617274-686F67"
+        
+    # Tuesday: Gọi hàm generate_tuesday_key đã implement ở trên
     if selected_day == 2:
         return generate_tuesday_key(username)
+        
+    # Wednesday: Sinh key theo logic riêng
     if selected_day == 3:
         data = username.encode("ascii", errors="strict")
         if len(data) < 4:
             raise ValueError("Wednesday branch requires at least 4 username characters.")
+            
+        # Tính toán phức tạp dựa vào 4 ký tự đầu của username
         al = (data[0] + data[1]) & 0xFF
         eax = (al * al) & 0xFFFF
         al = ((eax & 0xFF) << 4) & 0xFF
@@ -101,8 +123,11 @@ def generate_key(username: str, day: int | None = None) -> str:
         eax = (al * ah) & 0xFFFF
         al = ((eax & 0xFF) << 4) & 0xFF
         al = (al + data[2] + data[0]) & 0xFF
+        
+        # Tạo chuỗi serial dựa trên XOR và bswap
         original = (eax & 0xFFFFFF00) | al
         return f"{(original ^ bswap32(original)):X}"
+        
     raise RuntimeError(f"Day branch {selected_day} is not implemented in this keygen.")
 
 
