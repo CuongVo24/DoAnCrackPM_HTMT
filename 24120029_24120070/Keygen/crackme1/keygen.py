@@ -17,6 +17,7 @@ def rol(value: int, bits: int, size: int) -> int:
 
 
 def bswap32(value: int) -> int:
+    """Hàm đảo ngược byte (Byte Swap) mô phỏng lệnh BSWAP của x86."""
     return struct.unpack(">I", struct.pack("<I", value & MASK32))[0]
 
 
@@ -30,10 +31,15 @@ def get_computer_name() -> str:
 
 
 def machine_hash(computer_name: str) -> int:
+    """
+    Tính toán mã hash đặc trưng của máy tính dựa trên Computer Name.
+    Được mô phỏng từ đoạn mã Assembly của target.
+    """
     data = computer_name.encode("mbcs", errors="ignore") + (b"\x00" * 16)
     eax = ebx = ecx = edx = 0
     index = 0
 
+    # Lặp qua từng 2 byte của computer_name cho đến khi gặp null terminator
     while (data[index] | (data[index + 1] << 8)) != 0:
         eax = (eax & 0xFFFFFF00) | data[index]
         edx = (edx & 0xFFFFFF00) | data[index + 1]
@@ -55,14 +61,20 @@ def machine_hash(computer_name: str) -> int:
 
 
 def generate_key(username: str, computer_name: str | None = None) -> str:
+    """
+    Thuật toán sinh khóa chính (Keygen) cho Crackme 1.
+    Kết hợp giữa Computer Name Hash và Username.
+    """
     if not 4 <= len(username) <= 32:
         raise ValueError("Username length must be from 4 to 32 characters.")
 
+    # Bước 1: Tính toán Machine Hash
     mh = machine_hash(computer_name or get_computer_name())
     user_bytes = username.encode("mbcs", errors="strict") + b"\x00\x00"
     ebx, ecx, edx = 0, 0x7FFF, 0
     index = 0
 
+    # Bước 2: Vòng lặp XOR và tính toán các block hash cơ sở từ username
     while user_bytes[index] != 0:
         bx = user_bytes[index] | (user_bytes[index + 1] << 8)
         ebx = (ebx & 0xFFFF0000) | bx
@@ -79,6 +91,7 @@ def generate_key(username: str, computer_name: str | None = None) -> str:
         ecx = (ecx + eax) & MASK32
         index += 1
 
+    # Bước 3: Trộn các block (Mixing phase) 16 lần sử dụng phép cuộn bit (ROL/ROR)
     esi = edi = 0
     for _ in range(0x10):
         edi = (edi + ecx) & MASK32

@@ -2,6 +2,8 @@ import argparse
 import ctypes
 import datetime as dt
 import hashlib
+import os
+import subprocess
 
 MASK32 = 0xFFFFFFFF
 DEFAULT_DAY = 2
@@ -57,6 +59,10 @@ def cpu_mix_value() -> int:
 
 
 def generate_tuesday_key(username: str) -> str:
+    """
+    Thuật toán sinh khóa cho nhánh Thứ 3 (Tuesday).
+    Sử dụng CPUID mix XOR với 32 byte username lặp lại, sau đó nhân dồn.
+    """
     if not username:
         raise ValueError("Username must not be empty.")
 
@@ -83,6 +89,10 @@ def generate_tuesday_key(username: str) -> str:
 
 
 def generate_monday_key(username: str) -> str:
+    """
+    Thuật toán sinh khóa cho nhánh Thứ 2 (Monday).
+    Lấy byte thứ 4 của username XOR với 0x02 hoặc 0x03.
+    """
     data = username.encode("ascii", errors="strict")
     if len(data) < 4:
         raise ValueError("Monday branch requires at least 4 username characters.")
@@ -94,6 +104,10 @@ def generate_monday_key(username: str) -> str:
 
 
 def generate_wednesday_key(username: str) -> str:
+    """
+    Thuật toán sinh khóa cho nhánh Thứ 4 (Wednesday).
+    Thực hiện các phép nhân, cộng chéo các byte và dịch bit để tạo checksum.
+    """
     data = username.encode("ascii", errors="strict")
     if len(data) < 4:
         raise ValueError("Wednesday branch requires at least 4 username characters.")
@@ -112,11 +126,19 @@ def generate_wednesday_key(username: str) -> str:
 
 
 def generate_thursday_key(username: str) -> str:
+    """
+    Thuật toán sinh khóa cho nhánh Thứ 5 (Thursday).
+    Băm MD5 username và đảo ngược vị trí hai nửa của kết quả băm.
+    """
     digest = hashlib.md5(username.encode("latin-1", errors="strict")).digest()
     return (digest[8:16] + digest[:8]).hex().upper()
 
 
 def generate_friday_key(username: str) -> str:
+    """
+    Thuật toán sinh khóa cho nhánh Thứ 6 (Friday).
+    Sử dụng biến thể của Adler-32 (module 0xFFF1) lên username.
+    """
     total = 1
     multi = 0
     for byte in username.encode("latin-1", errors="strict"):
@@ -127,6 +149,90 @@ def generate_friday_key(username: str) -> str:
     multi %= 0xFFF1
     value = ((multi << 16) + total) & MASK32
     return f"{value:08X}-0400-0400-1229-03E9"
+
+
+def generate_saturday_key(username: str) -> str:
+    """
+    Thuật toán sinh khóa cho nhánh Thứ 7 (Saturday).
+    Do target sử dụng dll ngoài chứa tổ hợp hàm băm siêu phức tạp (MD5, SHA-1, RIPEMD),
+    nhóm thực hiện "Serial Fishing" thông qua kỹ thuật Memory Patching:
+    - Load helper.dll vào RAM thông qua PowerShell (vì dll là 32-bit).
+    - Patch lệnh JMP vào offset 0x519E để ép nhảy vào nhánh Thứ 7.
+    - Đọc kết quả Serial 8-byte trực tiếp từ vùng nhớ (offset 0xF9D4).
+    """
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    dll_paths = [
+        os.path.join(script_dir, "helper.dll"),
+        os.path.abspath(os.path.join(script_dir, "..", "..", "..", "Project crack phan mem", "crackme", "crack04", "helper.dll"))
+    ]
+    dll_path = next((p for p in dll_paths if os.path.exists(p)), None)
+    
+    if not dll_path:
+        raise RuntimeError("helper.dll not found. Saturday branch requires helper.dll to be present.")
+        
+    csharp_code = """
+using System;
+using System.Runtime.InteropServices;
+public class Helper {
+    [DllImport("kernel32.dll")]
+    public static extern IntPtr LoadLibrary(string dllToLoad);
+    [DllImport("kernel32.dll")]
+    public static extern bool VirtualProtect(IntPtr lpAddress, UIntPtr dwSize, uint flNewProtect, out uint lpflOldProtect);
+    [DllImport("kernel32.dll")]
+    public static extern IntPtr GetProcAddress(IntPtr hModule, string procedureName);
+    
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate int Xor0Fun(string username, string serial);
+    
+    public static string GetDay6(string dllPath, string username) {
+        IntPtr hMod = LoadLibrary(dllPath);
+        if (hMod == IntPtr.Zero) return "Error LoadLibrary";
+        
+        IntPtr patchAddr = IntPtr.Add(hMod, 0x519E);
+        uint oldProtect;
+        VirtualProtect(patchAddr, (UIntPtr)2, 0x40, out oldProtect);
+        Marshal.WriteByte(patchAddr, 0, 0xEB);
+        Marshal.WriteByte(patchAddr, 1, 0x5D);
+        VirtualProtect(patchAddr, (UIntPtr)2, oldProtect, out oldProtect);
+        
+        IntPtr pFunc = GetProcAddress(hMod, "xor0_fun");
+        Xor0Fun func = (Xor0Fun)Marshal.GetDelegateForFunctionPointer(pFunc, typeof(Xor0Fun));
+        
+        func(username, "0000000000000000");
+        
+        IntPtr outBuf = IntPtr.Add(hMod, 0xF9D4);
+        byte[] result = new byte[8];
+        Marshal.Copy(outBuf, result, 0, 8);
+        return BitConverter.ToString(result).Replace("-", "");
+    }
+}
+"""
+    ps_script = f'''
+$code = @"
+{csharp_code}
+"@
+Add-Type -TypeDefinition $code
+[Helper]::GetDay6('{dll_path.replace("\\", "\\\\")}', '{username.replace("'", "''")}')
+'''
+    import base64
+    b64 = base64.b64encode(ps_script.encode('utf-16le')).decode('utf-8')
+    
+    ps_exe = r"C:\Windows\SysWOW64\WindowsPowerShell\v1.0\powershell.exe"
+    if not os.path.exists(ps_exe):
+        ps_exe = "powershell.exe"
+        
+    try:
+        result = subprocess.run([ps_exe, "-NoProfile", "-ExecutionPolicy", "Bypass", "-EncodedCommand", b64],
+                                capture_output=True, text=True, check=True)
+        serial = result.stdout.strip()
+        if "Error" in serial or not serial:
+            raise RuntimeError(f"Failed to generate Day 6 key: {serial}")
+        return serial
+    except Exception as e:
+        if isinstance(e, subprocess.CalledProcessError):
+            raise RuntimeError(f"PowerShell execution failed: {e.stderr}")
+        raise RuntimeError(f"PowerShell execution failed: {e}")
+
 
 
 def current_windows_day() -> int:
@@ -149,7 +255,7 @@ def generate_key(username: str, day: int | None = None) -> str:
     if selected_day == 5:
         return generate_friday_key(username)
     if selected_day == 6:
-        raise RuntimeError("Saturday branch is not implemented; original uses a larger custom hash path.")
+        return generate_saturday_key(username)
     raise RuntimeError(f"Day branch {selected_day} is not implemented in this keygen.")
 
 

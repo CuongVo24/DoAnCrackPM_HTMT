@@ -25,6 +25,10 @@ def bswap32(value: int) -> int:
 
 
 def build_message_schedule(username: str) -> list[int]:
+    """
+    Xây dựng message schedule (các từ 32-bit) cho vòng lặp SHA-1.
+    Thực hiện padding chuỗi đầu vào theo chuẩn SHA-1.
+    """
     data = username.encode("latin-1", errors="strict")
     if not data:
         raise ValueError("Username must not be empty.")
@@ -46,7 +50,12 @@ def build_message_schedule(username: str) -> list[int]:
 
 
 def generate_key(username: str) -> str:
+    """
+    Hàm sinh khóa chính cho Crackme 2.
+    Sử dụng một biến thể của thuật toán băm SHA-1.
+    """
     words = build_message_schedule(username)
+    # Hằng số khởi tạo (Initialization vectors) của SHA-1 nhưng bị thay đổi thứ tự
     initial = [0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476, 0xC3D2E1F0]
     a, b, c, d, e = initial
 
@@ -64,11 +73,15 @@ def generate_key(username: str) -> str:
             f = b ^ c ^ d
             k = 0xCA62C1D6
 
+        # Tính toán vòng lặp chính của SHA-1, xoay bit và cộng dồn
         temp = u32(rol32(a, 5) + f + e + k + words[index])
         e, d, c, b, a = d, c, ror32(b, 2), a, temp
 
+    # Cộng kết quả vòng lặp vào các hằng số khởi tạo
     digest_words = [u32(left + right) for left, right in zip(initial, [a, b, c, d, e])]
     serial = []
+    
+    # Custom Hex Encoding: Ánh xạ 4 bit (nibble) thành ký tự ASCII đặc biệt
     for word in digest_words:
         for byte in word.to_bytes(4, "little"):
             nibble = byte & 0x0F
