@@ -79,11 +79,11 @@ Vi tri target goc dang co:
 | Crackme | File target |
 |---|---|
 | crackme1 | `Project crack phan mem\crackme\Crack01\KeygenMe1.exe` |
-| crackme2 | Chua co lai `errors_keygenme.exe` trong repo main |
+| crackme2 | `Project crack phan mem\crackme\crack02\errors_keygenme.exe` |
 | crackme3 | `Project crack phan mem\crackme\crack03\d2k2.crkme.09.exe` |
 | crackme4 | `Project crack phan mem\crackme\crack04\WhichKeyIsIt.exe` |
 
-Rui ro lon nhat hien tai: crackme2 thieu executable goc nen chua the chup anh runtime success that. Muon dat diem toi da, can tim lai `errors_keygenme.exe`, dua vao khu vuc tai lieu rieng, test keygen, va chen anh success vao bao cao.
+Rui ro lon nhat hien tai: crackme2 da duoc lay file `errors_keygenme.exe` tu nhanh develop, nhung file `.exe` co the bi Windows Defender/quarantine tren may local. Muon dat diem toi da, can restore/allow file nay trong Windows Security, test keygen, va chen anh success vao bao cao.
 
 ## 4. Checklist bao cao muc diem toi da
 
@@ -96,9 +96,9 @@ Moi crackme nen co du cac muc sau:
 - Serial minh hoa sinh ra tu keygen.
 - Anh man hinh keygen chay.
 - Anh man hinh crackme bao success.
-- Ghi ro gioi han neu co: crackme1 phu thuoc ComputerName, crackme4 phu thuoc ngay trong tuan, crackme2 dang thieu executable goc.
+- Ghi ro gioi han neu co: crackme1 phu thuoc ComputerName, crackme4 phu thuoc ngay trong tuan, crackme2 co file goc trong Git nhung co the bi Windows Defender/quarantine tren local.
 
-Chi nen tu cham 100% khi co anh runtime success that cho ca 4 crackme. Neu crackme2 van thieu file goc, hay ghi ro rui ro nay thay vi khang dinh da verify 100%.
+Chi nen tu cham 100% khi co anh runtime success that cho ca 4 crackme. Neu crackme2 van chua restore/chay duoc file goc, hay ghi ro rui ro nay thay vi khang dinh da verify 100%.
 
 ## 5. Cach lam crackme4 chac hon khi bao cao
 

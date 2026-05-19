@@ -25,7 +25,7 @@ Thư mục nộp bài:
 | Bài | Target gốc | Keygen chạy được | Target báo đúng key | Ghi chú |
 |---|---|---:|---:|---|
 | Crackme1 | `Project crack phan mem/crackme/Crack01/KeygenMe1.exe` | Có | Có | Đã chụp ảnh keygen và ảnh target báo `Serial is correct!`. |
-| Crackme2 | Thiếu `errors_keygenme.exe` | Có | Chưa | Thầy/đề có vẻ thiếu file chạy gốc, nên chỉ có thể báo cáo theo disassembly `crack2_asm_utf8*.txt` và keygen. |
+| Crackme2 | `Project crack phan mem/crackme/crack02/errors_keygenme.exe` | Có | Chưa | File target đã được lấy từ nhánh `develop`, nhưng trên máy local có thể bị Windows Defender/quarantine nên chưa runtime-verify lại được. |
 | Crackme3 | `Project crack phan mem/crackme/crack03/d2k2.crkme.09.exe` | Có | Có | Đã chụp ảnh keygen và ảnh target báo `Serial is OK`. |
 | Crackme4 | `Project crack phan mem/crackme/crack04/WhichKeyIsIt.exe` | Có | Có | Đã chụp ảnh target báo `You did it!!` với serial nhánh Tuesday. |
 
@@ -67,7 +67,7 @@ Lưu ý khi đưa Hình 7 vào Word: đây là ảnh runtime success thật củ
 
 - Ảnh disassembly/debug cho crackme1 tại đoạn `0x4011A2..0x401296` hoặc đoạn hash máy `0x40132D..0x40136F`.
 - Ảnh disassembly/debug cho crackme2 tại đoạn SHA-1/custom hash và đoạn so khớp 20 ký tự serial.
-- Ảnh target gốc crackme2 báo đúng key, nếu tìm lại được `errors_keygenme.exe`.
+- Ảnh target gốc crackme2 báo đúng key, nếu restore/allow được `errors_keygenme.exe` trên Windows Security.
 - Ảnh disassembly/debug cho crackme3 tại đoạn xử lý bảng ký tự.
 - Ảnh disassembly/debug cho crackme4 tại đoạn lấy ngày trong tuần/nhánh Tuesday.
 
@@ -162,13 +162,13 @@ Serial: 1823E438-6D94BBC0-E1DFE0E1-0C17DFDC
 
 ### 4.1. File target
 
-File target gốc hiện đang thiếu trong workspace:
+File target gốc đã được lấy từ nhánh `develop`:
 
 ```text
 Project crack phan mem/crackme/crack02/errors_keygenme.exe
 ```
 
-Do đó phần này chưa thể chụp ảnh runtime success. Bài vẫn có thể trình bày theo các file disassembly đã trích:
+Tuy nhiên trên máy local file `.exe` có thể bị Windows Defender/quarantine ngay khi restore từ Git. Do đó phần này chưa có ảnh runtime success. Bài vẫn có thể trình bày theo các file disassembly đã trích:
 
 ```text
 crack2_asm_utf8.txt
@@ -239,7 +239,7 @@ for each byte in digest:
 
 ### 4.5. Rủi ro
 
-Do thiếu `errors_keygenme.exe`, nhóm chưa runtime-verify được serial trên target gốc. Vì vậy không nên tự chấm tuyệt đối cho phần này nếu giáo viên yêu cầu ảnh target báo success.
+Do `errors_keygenme.exe` có thể bị Windows Defender giữ lại trên máy local, nhóm chưa runtime-verify được serial trên target gốc. Vì vậy không nên tự chấm tuyệt đối cho phần này nếu giáo viên yêu cầu ảnh target báo success.
 
 ## 5. Crackme3 - d2k2.crkme.09.exe
 
@@ -405,9 +405,9 @@ Rủi ro còn lại: crackme4 phụ thuộc ngày trong tuần và thông tin CP
 | Có file `keygen.exe` cho 4 bài | Đạt |
 | Có ảnh keygen chạy cho 4 bài | Đạt |
 | Có ảnh target success cho crackme1 | Đạt |
-| Có ảnh target success cho crackme2 | Chưa đạt do thiếu `errors_keygenme.exe` |
+| Có ảnh target success cho crackme2 | Chưa đạt do chưa runtime-verify được `errors_keygenme.exe` |
 | Có ảnh target success cho crackme3 | Đạt |
 | Có ảnh target success cho crackme4 | Đạt |
 | Báo cáo thuật toán/pseudocode | Đạt mức tạm, nên bổ sung ảnh disassembly nếu còn thời gian |
 
-Kết luận: bài hiện tại có thể nộp tạm với minh chứng runtime tốt cho crackme1, crackme3 và crackme4. Crackme2 vẫn là phần rủi ro chính vì thiếu `errors_keygenme.exe`, nên chưa có ảnh target gốc báo success.
+Kết luận: bài hiện tại có thể nộp tạm với minh chứng runtime tốt cho crackme1, crackme3 và crackme4. Crackme2 vẫn là phần rủi ro chính vì chưa runtime-verify được `errors_keygenme.exe`, nên chưa có ảnh target gốc báo success.
