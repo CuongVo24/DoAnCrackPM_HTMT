@@ -1,0 +1,284 @@
+
+ĐỒ ÁN CỘNG ĐIỂM
+CRACK PHẦN MỀM (CRACKME)
+
+Môn học: Hệ Thống máy Tính
+Hình thức: Nhóm tối đa 2 sinh viên
+
+Nhóm sinh viên thực hiện
+MSSV1: ___________________________
+MSSV2: ___________________________
+
+1. Tổng Quan
+
+Đây là đồ án cộng điểm môn học liên quan đến bảo mật phần mềm và kỹ thuật dịch ngược (reverse engineering). Sinh viên sẽ phân tích các chương trình "crackme" — tức các phần mềm được thiết kế đặc biệt để luyện tập kỹ năng crack — nhằm tìm hiểu cơ chế sinh khóa bản quyền.
+
+Qua đồ án này, sinh viên sẽ được củng cố và phát triển các kỹ năng:
+Sử dụng công cụ dịch ngược (disassembler, debugger) để phân tích chương trình
+Đọc và hiểu mã assembly / pseudocode
+Phân tích thuật toán sinh khóa bản quyền
+Lập trình ứng dụng keygen thực tế
+
+2. Hình Thức Làm Bài
+
+Tiêu chí
+Chi tiết
+Số thành viên
+Tối đa 2 sinh viên / nhóm
+Hình thức nộp
+File báo cáo (.doc/.docx) + Thư mục Keygen
+Tên file báo cáo
+MSSV1_MSSV2.doc hoặc MSSV1_MSSV2.docx
+
+3. Yêu Cầu Chi Tiết (Bắt Buộc)
+
+Với mỗi crackme trong đề bài, sinh viên phải thực hiện đầy đủ 4 bước sau:
+
+Bước 1 — Xác Định Đoạn Code Phát Sinh Key
+Sử dụng các công cụ dịch ngược phù hợp: OllyDbg, x64dbg, IDA Pro, Ghidra...
+Tìm và chỉ ra đúng đoạn mã assembly / pseudocode chịu trách nhiệm tính toán và kiểm tra serial/key
+Trình bày đoạn mã tìm được rõ ràng trong báo cáo, có chú thích
+Kèm ảnh chụp màn hình công cụ minh họa quá trình tìm kiếm
+
+Bước 2 — Giải Thích Ý Nghĩa Thuật Toán
+Đọc hiểu đoạn mã assembly/pseudocode đã tìm được
+Diễn giải thuật toán bằng ngôn ngữ tự nhiên và/hoặc code giả (pseudocode) dễ hiểu
+Ví dụ: "Chương trình lấy từng ký tự của username, cộng giá trị ASCII lại, sau đó XOR với 0x1234 để tạo ra key"
+Mô tả rõ đầu vào, đầu ra và từng bước biến đổi dữ liệu của thuật toán
+
+Bước 3 — Đưa Ra Key Minh Họa
+Chọn một username cụ thể (ví dụ: họ tên sinh viên hoặc MSSV)
+Tính toán thủ công hoặc bán tự động để cho ra serial/key hợp lệ tương ứng với username đó
+Chụp ảnh màn hình chứng minh key đúng khi nhập vào chương trình crackme gốc
+Trình bày rõ từng bước tính toán trong báo cáo
+
+Bước 4 — Viết Chương Trình Keygen Hoàn Chỉnh
+Người dùng nhập username vào chương trình Keygen
+Keygen tự động tính toán và xuất ra key hợp lệ tương ứng
+Có thể viết bằng bất kỳ ngôn ngữ lập trình nào: Python, C/C++, C#, Java...
+Keygen phải chạy được thực tế và cho ra key đúng khi kiểm tra với crackme gốc
+Source code phải có chú thích, dễ đọc, dễ hiểu
+Nộp kèm cả source code và file thực thi
+
+4. Cấu Trúc Nộp Bài
+
+Sinh viên nộp một thư mục được đặt tên theo mã số sinh viên, bao gồm:
+
+Thành phần
+Mô tả
+MSSV1_MSSV2.docx
+File báo cáo chính, trình bày đầy đủ theo yêu cầu
+Keygen/crackme1/
+Source code + file thực thi keygen cho crackme 1
+Keygen/crackme2/
+Source code + file thực thi keygen cho crackme 2
+Keygen/crackme.../
+(Tương tự cho các crackme còn lại)
+
+5. Nội Dung Báo Cáo Cần Có
+
+Báo cáo phải trình bày đầy đủ các mục sau, theo thứ tự:
+
+Từng bước quá trình phân tích mỗi crackme — kèm ảnh chụp màn hình công cụ (x64dbg, Ghidra, IDA,...)
+Thuật toán phát sinh khóa — được mô tả chi tiết bằng ngôn ngữ tự nhiên, code giả hoặc sơ đồ
+Minh họa key — với username cụ thể, kèm bằng chứng key hợp lệ (ảnh chụp màn hình)
+Hướng dẫn sử dụng Keygen — cách chạy, cách nhập username, cách đọc kết quả
+Bảng tự đánh giá — điền đầy đủ theo mẫu bộ tiêu chí tại Mục 6
+
+6. Bộ Tiêu Chí Tự Đánh Giá
+
+Sinh viên điền đầy đủ các bảng dưới đây vào cuối báo cáo cho từng crackme. Việc tự đánh giá trung thực và chi tiết sẽ được ghi nhận trong quá trình chấm điểm.
+
+6.1 Phần A — Phân Tích & Dịch Ngược (40 điểm)
+#
+Tiêu chí
+Điểm tối đa
+Tự chấm
+Ghi chú
+A1
+Xác định đúng công cụ phù hợp và mô tả cách sử dụng
+5
+
+
+A2
+Tìm được đúng hàm / đoạn mã kiểm tra key
+10
+
+
+A3
+Trình bày đoạn mã assembly / pseudocode rõ ràng, có chú thích
+10
+
+
+A4
+Giải thích đúng ý nghĩa từng bước của thuật toán
+10
+
+
+A5
+Có ảnh chụp màn hình minh họa quá trình phân tích
+5
+
+
+Tổng phần A
+40
+
+
+
+6.2 Phần B — Tìm Key Minh Họa (20 điểm)
+#
+Tiêu chí
+Điểm tối đa
+Tự chấm
+Ghi chú
+B1
+Chọn username cụ thể và trình bày rõ ràng
+5
+
+
+B2
+Tính toán đúng key tương ứng với username đã chọn
+10
+
+
+B3
+Có ảnh chụp màn hình chứng minh key hợp lệ khi nhập vào crackme
+5
+
+
+Tổng phần B
+20
+
+
+
+
+
+
+6.3 Phần C — Keygen (40 điểm)
+#
+Tiêu chí
+Điểm tối đa
+Tự chấm
+Ghi chú
+C1
+Keygen có giao diện nhập username rõ ràng
+5
+
+
+C2
+Keygen sinh đúng key khớp với thuật toán gốc của crackme
+20
+
+
+C3
+Keygen chạy được thực tế, không lỗi runtime
+5
+
+
+C4
+Source code có chú thích đầy đủ, dễ đọc, dễ hiểu
+5
+
+
+C5
+Có hướng dẫn sử dụng keygen trong báo cáo
+5
+
+
+Tổng phần C
+40
+
+
+
+6.4 Bảng Tổng Hợp Theo Từng Crackme
+Crackme
+Phần A (/40)
+Phần B (/20)
+Phần C (/40)
+Tổng (/100)
+% Hoàn thành
+Lý do chưa HT
+Crackme 1
+
+
+
+
+
+
+Crackme 2
+
+
+
+
+
+
+Crackme 3
+
+
+
+
+
+
+Crackme 4
+
+
+
+
+
+
+Trung bình
+
+
+
+
+  %
+
+6.5 Thang Đánh Giá Mức Độ Hoàn Thành
+Mức
+% Hoàn thành
+Mô tả
+🟢 Xuất sắc
+90 – 100%
+Hoàn thành đầy đủ, keygen chạy tốt, phân tích chi tiết rõ ràng
+🔵 Tốt
+75 – 89%
+Hoàn thành phần lớn, keygen có thể còn một vài thiếu sót nhỏ
+🟡 Đạt
+50 – 74%
+Phân tích được nhưng keygen chưa hoàn chỉnh hoặc còn lỗi
+🟠 Chưa đạt
+25 – 49%
+Chỉ làm được phân tích sơ bộ, chưa có keygen hoạt động được
+🔴 Không HT
+0 – 24%
+Chưa phân tích được thuật toán, không có sản phẩm hoàn chỉnh
+
+6.6 Phần Nhận Xét Tự Do
+Sinh viên trả lời ngắn gọn (5–10 dòng mỗi câu) các câu hỏi sau:
+
+Câu 1: Khó khăn lớn nhất gặp phải trong quá trình thực hiện là gì?
+(Sinh viên điền vào đây)
+
+Câu 2: Kiến thức / kỹ năng nào được củng cố hoặc học thêm được qua đồ án này?
+(Sinh viên điền vào đây)
+
+Câu 3: Nếu có thêm thời gian, nhóm sẽ cải thiện điểm nào?
+(Sinh viên điền vào đây)
+
+7. Công Cụ Gợi Ý
+
+Mục đích
+Công cụ
+Dịch ngược / Debug
+x64dbg, OllyDbg, IDA Pro Free, Ghidra
+Xem chuỗi trong file
+Strings, PE Explorer, CFF Explorer
+Phân tích .NET
+dnSpy, dotPeek, ILSpy
+Phân tích Java
+jadx, jd-gui, Bytecode Viewer
+Viết Keygen
+Python, C/C++, C#, Java
+
+⚠️  Lưu Ý Đạo Đức Quan Trọng
+Kỹ năng reverse engineering chỉ được sử dụng cho mục đích học tập, nghiên cứu bảo mật hợp pháp, và các crackme được thiết kế riêng cho việc luyện tập. Nghiêm cấm áp dụng kỹ thuật này lên phần mềm thương mại thực tế. Mọi hành vi vi phạm bản quyền phần mềm đều bị xử lý theo quy định pháp luật.

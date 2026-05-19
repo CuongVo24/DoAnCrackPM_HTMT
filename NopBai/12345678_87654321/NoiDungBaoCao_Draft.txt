@@ -1,0 +1,21 @@
+BÁO CÁO ĐỒ ÁN MÔN HỌC
+Môn: Dịch Ngược Phần Mềm
+Sinh viên: Khang
+MSSV: 12345678_87654321
+
+1. Crackme 1
+Thuật toán: KeygenMe1 sử dụng các phép toán bitwise (XOR, ROR, ROL) trên mã hash của tên máy tính (GetComputerNameA) để sinh ra serial hợp lệ. Quá trình kiểm tra so sánh kết quả tính toán với serial người dùng nhập vào.
+Keygen được viết bằng Python, sao chép lại logic XOR/ROR/ROL từ assembly.
+
+2. Crackme 2
+Thuật toán: errors_keygenme sử dụng thuật toán mã hóa SHA-1 kết hợp với kỹ thuật chống dịch ngược bằng Structured Exception Handling (SEH). Ngoại lệ chia cho 0 (div eax) được sử dụng để chuyển luồng thực thi sang handler tại 0x402065. Tên đăng nhập được băm bằng SHA-1, sau đó 5 DWORD kết quả được chuyển đổi (bswap) và định dạng thành chuỗi serial dài 55 ký tự (dạng octal/base32) để so sánh.
+Quá trình dịch ngược gặp nhiều khó khăn do SEH và việc mã hóa động tên các hàm API (GetProcAddress).
+
+3. Crackme 3
+Thuật toán: Mô phỏng cơ bản phép biến đổi chuỗi dựa trên phép XOR từng ký tự của username với một hằng số cố định, sau đó định dạng lại dưới dạng chuỗi thập lục phân có tiền tố.
+
+4. Crackme 4
+Thuật toán: Áp dụng thuật toán băm (hash) dạng chuỗi cấp số cộng. Giá trị của từng ký tự trong username được nhân với vị trí của nó và cộng dồn lại để tạo thành serial cuối cùng.
+
+Kết luận
+Quá trình thực hiện đồ án đã giúp củng cố kiến thức về ngôn ngữ Assembly x86, cấu trúc file PE, kỹ thuật hooking, và các phương pháp chống dịch ngược nâng cao như SEH. Đặc biệt, việc viết keygen đòi hỏi sự hiểu biết sâu sắc về thuật toán nội tại của ứng dụng.

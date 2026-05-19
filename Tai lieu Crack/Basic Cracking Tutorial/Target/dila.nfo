@@ -1,0 +1,14 @@
+Welcome to my fishing challenges.
+
+These small challenges are designed to test your debugging and assembly skills.
+
+I've decided not to overwhelm you with instructions, as most crackmes do
+but rather keep the code to a minimum, focusing on one or two really specific tricks.
+
+The crackmes range in difficulty from a single comparison with an immediate constant
+to some slightly more elaborate execution control - however all of the crackmes
+follow on from each other, all the window code is exactly the same.
+
+If you would like some help please feel free to contact me: dila@myrealbox.com
+
+- http://dila.mine.nu
