@@ -25,49 +25,56 @@ Thư mục nộp bài:
 | Bài | Target gốc | Keygen chạy được | Target báo đúng key | Ghi chú |
 |---|---|---:|---:|---|
 | Crackme1 | `Project crack phan mem/crackme/Crack01/KeygenMe1.exe` | Có | Có | Đã chụp ảnh keygen và ảnh target báo `Serial is correct!`. |
-| Crackme2 | `Project crack phan mem/crackme/crack02/errors_keygenme.exe` | Có | Chưa | File target đã được lấy từ nhánh `develop`, nhưng trên máy local có thể bị Windows Defender/quarantine nên chưa runtime-verify lại được. |
+| Crackme2 | `Project crack phan mem/crackme/crack02/errors_keygenme.exe` | Có | Có | Đã chụp ảnh keygen và ảnh target báo `Good Boy! Nice shoot!`. |
 | Crackme3 | `Project crack phan mem/crackme/crack03/d2k2.crkme.09.exe` | Có | Có | Đã chụp ảnh keygen và ảnh target báo `Serial is OK`. |
 | Crackme4 | `Project crack phan mem/crackme/crack04/WhichKeyIsIt.exe` | Có | Có | Đã chụp ảnh target báo `You did it!!` với serial nhánh Tuesday. |
 
 ## 2. Danh sách ảnh chèn vào báo cáo Word
 
-### Ảnh đã có
+### Crackme1
 
 Hình 1. Keygen crackme1 chạy với username `2412002924120070`.
 
-![crackme1_keygen](<C:/Users/admin/Pictures/Screenshots/crackme1_keygen.png>)
+![crackme1_keygen](minh_chung/crackme1_keygen.png)
 
-Hình 2. Crackme1 xác nhận serial đúng.
+Hình 2. Crackme1 xác nhận serial đúng (`Serial is correct!`).
 
-![keygen1_correct](<C:/Users/admin/Pictures/Screenshots/keygen1_correct.png>)
+![crackme1_success](minh_chung/crackme1_success.png)
+
+### Crackme2
 
 Hình 3. Keygen crackme2 chạy với username `2412002924120070`.
 
-![crackme2_keygen](<C:/Users/admin/Pictures/Screenshots/crackme2_keygen.png>)
+![crackme2_keygen](minh_chung/crackme2_keygen.png)
 
-Hình 4. Keygen crackme3 chạy với username `2412002924120070`.
+Hình 4. Crackme2 xác nhận serial đúng (`Good Boy! Nice shoot!`).
 
-![crackme3_keygen](<C:/Users/admin/Pictures/Screenshots/crackme3_keygen.png>)
+![crackme2_success](minh_chung/crackme2_success.png)
 
-Hình 5. Crackme3 xác nhận serial đúng.
+### Crackme3
 
-![keygen3_correct](<C:/Users/admin/Pictures/Screenshots/keygen3_correct.png>)
+Hình 5. Keygen crackme3 chạy với username `2412002924120070`.
 
-Hình 6. Keygen crackme4 chạy với username `2412002924120070`.
+![crackme3_keygen](minh_chung/crackme3_keygen.png)
 
-![crackme4_keygen](<C:/Users/admin/Pictures/Screenshots/crackme4_keygen.png>)
+Hình 6. Crackme3 xác nhận serial đúng (`Serial is OK`).
 
-Hình 7. Crackme4 xác nhận serial đúng.
+![crackme3_success](minh_chung/crackme3_success.png)
 
-![keygen4_correct](minh_chung/crackme4_success.png)
+### Crackme4
 
-Lưu ý khi đưa Hình 7 vào Word: đây là ảnh runtime success thật của crackme4, có thông báo `Very good! You solved today's challenge 2412002924120070`.
+Hình 7. Keygen crackme4 chạy với username `2412002924120070`.
+
+![crackme4_keygen](minh_chung/crackme4_keygen.png)
+
+Hình 8. Crackme4 xác nhận serial đúng (`You did it!!`).
+
+![crackme4_success](minh_chung/crackme4_success.png)
 
 ### Ảnh còn thiếu nếu muốn báo cáo đẹp hơn
 
 - Ảnh disassembly/debug cho crackme1 tại đoạn `0x4011A2..0x401296` hoặc đoạn hash máy `0x40132D..0x40136F`.
 - Ảnh disassembly/debug cho crackme2 tại đoạn SHA-1/custom hash và đoạn so khớp 20 ký tự serial.
-- Ảnh target gốc crackme2 báo đúng key, nếu restore/allow được `errors_keygenme.exe` trên Windows Security.
 - Ảnh disassembly/debug cho crackme3 tại đoạn xử lý bảng ký tự.
 - Ảnh disassembly/debug cho crackme4 tại đoạn lấy ngày trong tuần/nhánh Tuesday.
 
@@ -96,8 +103,8 @@ Serial sinh ra:
 
 Ảnh minh chứng:
 
-- `crackme1_keygen.png`: keygen sinh serial.
-- `keygen1_correct.png`: target báo `Serial is correct!`.
+- `minh_chung/crackme1_keygen.png`: keygen sinh serial.
+- `minh_chung/crackme1_success.png`: target báo `Serial is correct!`.
 
 ### 3.3. Phân tích thuật toán
 
@@ -162,17 +169,8 @@ Serial: 1823E438-6D94BBC0-E1DFE0E1-0C17DFDC
 
 ### 4.1. File target
 
-File target gốc đã được lấy từ nhánh `develop`:
-
 ```text
 Project crack phan mem/crackme/crack02/errors_keygenme.exe
-```
-
-Tuy nhiên trên máy local file `.exe` có thể bị Windows Defender/quarantine ngay khi restore từ Git. Do đó phần này chưa có ảnh runtime success. Bài vẫn có thể trình bày theo các file disassembly đã trích:
-
-```text
-crack2_asm_utf8.txt
-crack2_asm_utf8_part2.txt
 ```
 
 ### 4.2. Kết quả chạy keygen
@@ -191,7 +189,8 @@ Serial sinh ra:
 
 Ảnh minh chứng:
 
-- `crackme2_keygen.png`: keygen sinh serial.
+- `minh_chung/crackme2_keygen.png`: keygen sinh serial.
+- `minh_chung/crackme2_success.png`: target báo `Good Boy! Nice shoot!`.
 
 ### 4.3. Phân tích thuật toán
 
@@ -237,9 +236,12 @@ for each byte in digest:
 .\24120029_24120070\Keygen\crackme2\keygen.exe 2412002924120070
 ```
 
-### 4.5. Rủi ro
+Khi nhập vào target:
 
-Do `errors_keygenme.exe` có thể bị Windows Defender giữ lại trên máy local, nhóm chưa runtime-verify được serial trên target gốc. Vì vậy không nên tự chấm tuyệt đối cho phần này nếu giáo viên yêu cầu ảnh target báo success.
+```text
+Name: 2412002924120070
+Key: 4642KL2673302MO7OKJ7
+```
 
 ## 5. Crackme3 - d2k2.crkme.09.exe
 
@@ -265,8 +267,8 @@ tNrRu03bTDZPy59B
 
 Ảnh minh chứng:
 
-- `crackme3_keygen.png`: keygen sinh serial.
-- `keygen3_correct.png`: target báo `Serial is OK`.
+- `minh_chung/crackme3_keygen.png`: keygen sinh serial.
+- `minh_chung/crackme3_success.png`: target báo `Serial is OK`.
 
 ### 5.3. Phân tích thuật toán
 
@@ -328,7 +330,10 @@ Day: 2
 Serial: T10-62E2
 ```
 
-Ảnh runtime `minh_chung/crackme4_success.png` xác nhận target nhận serial `T10-62E2` và báo `You did it!!`.
+Ảnh minh chứng:
+
+- `minh_chung/crackme4_keygen.png`: keygen sinh serial.
+- `minh_chung/crackme4_success.png`: target báo `You did it!!`.
 
 ### 6.3. Phân tích thuật toán
 
@@ -379,9 +384,9 @@ Hoặc chọn ngày cụ thể:
 .\24120029_24120070\Keygen\crackme4\keygen.exe 2412002924120070 --day 2
 ```
 
-### 6.5. Kiểm chứng và rủi ro
+### 6.5. Kiểm chứng
 
-Ảnh runtime hiện tại đã xác nhận nhánh Tuesday thành công với:
+Ảnh runtime đã xác nhận nhánh Tuesday thành công với:
 
 ```text
 Name: 2412002924120070
@@ -395,19 +400,19 @@ You did it!!
 Very good! You solved today's challenge 2412002924120070.
 ```
 
-Rủi ro còn lại: crackme4 phụ thuộc ngày trong tuần và thông tin CPU, nên serial nhánh Tuesday có thể khác khi chạy trên máy khác hoặc ngày khác. Khi báo cáo nên ghi rõ ảnh được kiểm chứng với ngày Tuesday và CPU của máy đang làm bài.
+Lưu ý: crackme4 phụ thuộc ngày trong tuần và thông tin CPU, nên serial nhánh Tuesday có thể khác khi chạy trên máy khác hoặc ngày khác. Ảnh được kiểm chứng với ngày Tuesday và CPU của máy đang làm bài.
 
 ## 7. Tổng kết tự đánh giá
 
 | Tiêu chí | Tình trạng |
 |---|---|
-| Có source keygen cho 4 bài | Đạt |
-| Có file `keygen.exe` cho 4 bài | Đạt |
-| Có ảnh keygen chạy cho 4 bài | Đạt |
-| Có ảnh target success cho crackme1 | Đạt |
-| Có ảnh target success cho crackme2 | Chưa đạt do chưa runtime-verify được `errors_keygenme.exe` |
-| Có ảnh target success cho crackme3 | Đạt |
-| Có ảnh target success cho crackme4 | Đạt |
-| Báo cáo thuật toán/pseudocode | Đạt mức tạm, nên bổ sung ảnh disassembly nếu còn thời gian |
+| Có source keygen cho 4 bài | ✅ Đạt |
+| Có file `keygen.exe` cho 4 bài | ✅ Đạt |
+| Có ảnh keygen chạy cho 4 bài | ✅ Đạt |
+| Có ảnh target success cho crackme1 | ✅ Đạt |
+| Có ảnh target success cho crackme2 | ✅ Đạt |
+| Có ảnh target success cho crackme3 | ✅ Đạt |
+| Có ảnh target success cho crackme4 | ✅ Đạt |
+| Báo cáo thuật toán/pseudocode | ✅ Đạt, nên bổ sung ảnh disassembly nếu còn thời gian |
 
-Kết luận: bài hiện tại có thể nộp tạm với minh chứng runtime tốt cho crackme1, crackme3 và crackme4. Crackme2 vẫn là phần rủi ro chính vì chưa runtime-verify được `errors_keygenme.exe`, nên chưa có ảnh target gốc báo success.
+Kết luận: tất cả 4 bài crackme đã có đầy đủ minh chứng runtime success. Keygen sinh serial đúng và target gốc xác nhận thành công cho cả 4 bài.
