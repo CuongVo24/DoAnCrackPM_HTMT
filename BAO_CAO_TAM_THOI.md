@@ -27,7 +27,7 @@ Thư mục nộp bài:
 | Crackme1 | `Project crack phan mem/crackme/Crack01/KeygenMe1.exe` | Có | Có | Đã chụp ảnh keygen và ảnh target báo `Serial is correct!`. |
 | Crackme2 | Thiếu `errors_keygenme.exe` | Có | Chưa | Thầy/đề có vẻ thiếu file chạy gốc, nên chỉ có thể báo cáo theo disassembly `crack2_asm_utf8*.txt` và keygen. |
 | Crackme3 | `Project crack phan mem/crackme/crack03/d2k2.crkme.09.exe` | Có | Có | Đã chụp ảnh keygen và ảnh target báo `Serial is OK`. |
-| Crackme4 | `Project crack phan mem/crackme/crack04/WhichKeyIsIt.exe` | Có | Chưa chắc | Crackme phụ thuộc ngày trong tuần và CPUID. Ảnh hiện có chưa có popup/thông báo success, nên chỉ nên ghi là đã sinh key, chưa xác nhận runtime thành công. |
+| Crackme4 | `Project crack phan mem/crackme/crack04/WhichKeyIsIt.exe` | Có | Có | Đã chụp ảnh target báo `You did it!!` với serial nhánh Tuesday. |
 
 ## 2. Danh sách ảnh chèn vào báo cáo Word
 
@@ -57,11 +57,11 @@ Hình 6. Keygen crackme4 chạy với username `2412002924120070`.
 
 ![crackme4_keygen](<C:/Users/admin/Pictures/Screenshots/crackme4_keygen.png>)
 
-Hình 7. Màn hình nhập serial crackme4.
+Hình 7. Crackme4 xác nhận serial đúng.
 
-![keygen4_correct](<C:/Users/admin/Pictures/Screenshots/keygen4_correct.png>)
+![keygen4_correct](minh_chung/crackme4_success.png)
 
-Lưu ý khi đưa Hình 7 vào Word: ảnh này chưa chứng minh thành công vì chưa có hộp thoại hoặc trạng thái báo đúng key. Nếu không kịp chụp lại, chỉ dùng ảnh này như ảnh minh họa giao diện nhập serial, không gọi là ảnh success.
+Lưu ý khi đưa Hình 7 vào Word: đây là ảnh runtime success thật của crackme4, có thông báo `Very good! You solved today's challenge 2412002924120070`.
 
 ### Ảnh còn thiếu nếu muốn báo cáo đẹp hơn
 
@@ -70,7 +70,6 @@ Lưu ý khi đưa Hình 7 vào Word: ảnh này chưa chứng minh thành công 
 - Ảnh target gốc crackme2 báo đúng key, nếu tìm lại được `errors_keygenme.exe`.
 - Ảnh disassembly/debug cho crackme3 tại đoạn xử lý bảng ký tự.
 - Ảnh disassembly/debug cho crackme4 tại đoạn lấy ngày trong tuần/nhánh Tuesday.
-- Ảnh crackme4 báo success thật nếu kiểm chứng được đúng ngày và đúng serial.
 
 ## 3. Crackme1 - KeygenMe1.exe
 
@@ -329,7 +328,7 @@ Day: 2
 Serial: T10-62E2
 ```
 
-Lưu ý: ảnh `crackme4_keygen.png` hiện có đang hiển thị serial cũ `T10-67E7`. Nếu có thời gian, nên chụp lại ảnh keygen4 sau khi chạy bản `keygen.exe` mới nhất. Nếu không chụp lại, không nên dùng ảnh này để khẳng định runtime success.
+Ảnh runtime `minh_chung/crackme4_success.png` xác nhận target nhận serial `T10-62E2` và báo `You did it!!`.
 
 ### 6.3. Phân tích thuật toán
 
@@ -380,21 +379,23 @@ Hoặc chọn ngày cụ thể:
 .\24120029_24120070\Keygen\crackme4\keygen.exe 2412002924120070 --day 2
 ```
 
-### 6.5. Rủi ro
+### 6.5. Kiểm chứng và rủi ro
 
-Ảnh runtime hiện có cho crackme4 chưa có thông báo success. Ngoài ra trong ảnh đang nhập:
-
-```text
-T10-67E7 Day: 2
-```
-
-Đây không phải format serial đúng. Ô Serial chỉ nên chứa serial, ví dụ:
+Ảnh runtime hiện tại đã xác nhận nhánh Tuesday thành công với:
 
 ```text
-T10-62E2
+Name: 2412002924120070
+Serial: T10-62E2
 ```
 
-Nếu không kịp kiểm chứng lại, phần crackme4 nên ghi là đã phân tích và sinh key theo nhánh Tuesday, nhưng chưa có ảnh xác nhận runtime thành công.
+Thông báo nhận được từ target:
+
+```text
+You did it!!
+Very good! You solved today's challenge 2412002924120070.
+```
+
+Rủi ro còn lại: crackme4 phụ thuộc ngày trong tuần và thông tin CPU, nên serial nhánh Tuesday có thể khác khi chạy trên máy khác hoặc ngày khác. Khi báo cáo nên ghi rõ ảnh được kiểm chứng với ngày Tuesday và CPU của máy đang làm bài.
 
 ## 7. Tổng kết tự đánh giá
 
@@ -402,11 +403,11 @@ Nếu không kịp kiểm chứng lại, phần crackme4 nên ghi là đã phân
 |---|---|
 | Có source keygen cho 4 bài | Đạt |
 | Có file `keygen.exe` cho 4 bài | Đạt |
-| Có ảnh keygen chạy cho 4 bài | Đạt, nhưng crackme4 nên chụp lại vì serial đã cập nhật |
+| Có ảnh keygen chạy cho 4 bài | Đạt |
 | Có ảnh target success cho crackme1 | Đạt |
 | Có ảnh target success cho crackme2 | Chưa đạt do thiếu `errors_keygenme.exe` |
 | Có ảnh target success cho crackme3 | Đạt |
-| Có ảnh target success cho crackme4 | Chưa chắc, ảnh hiện tại chưa có thông báo success |
+| Có ảnh target success cho crackme4 | Đạt |
 | Báo cáo thuật toán/pseudocode | Đạt mức tạm, nên bổ sung ảnh disassembly nếu còn thời gian |
 
-Kết luận: bài hiện tại có thể nộp tạm với mức khá tốt cho crackme1 và crackme3, có keygen và phân tích cho crackme2 nhưng thiếu target gốc để verify, còn crackme4 cần ghi rõ giới hạn vì chưa có ảnh success chắc chắn.
+Kết luận: bài hiện tại có thể nộp tạm với minh chứng runtime tốt cho crackme1, crackme3 và crackme4. Crackme2 vẫn là phần rủi ro chính vì thiếu `errors_keygenme.exe`, nên chưa có ảnh target gốc báo success.
