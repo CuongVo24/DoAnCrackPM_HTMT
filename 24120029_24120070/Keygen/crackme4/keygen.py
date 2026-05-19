@@ -71,9 +71,12 @@ def generate_tuesday_key(username: str) -> str:
             repeated[offset + index] ^= mix_bytes[index]
 
     value = 0xB00B
+    multiplier = 0
     for byte in repeated:
-        product = (byte * length) & MASK32
-        value = ((value ^ product) << 4) & MASK32
+        multiplier |= byte
+        multiplier = (multiplier * length) & MASK32
+        value = ((value ^ multiplier) << 4) & MASK32
+        multiplier &= 0xFFFFFF00
 
     value = (value ^ (value >> 16)) & 0xFFFF
     return f"T10-{value:04X}"

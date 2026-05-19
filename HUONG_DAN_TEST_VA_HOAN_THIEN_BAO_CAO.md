@@ -44,7 +44,7 @@ Ket qua mong doi tren may `LAPTOPCUACUONG`:
 | crackme1 | `1823E438-6D94BBC0-E1DFE0E1-0C17DFDC` |
 | crackme2 | `4642KL2673302MO7OKJ7` |
 | crackme3 | `tNrRu03bTDZPy59B` |
-| crackme4 | `T10-67E7` voi `Day: 2` |
+| crackme4 | `T10-62E2` voi `Day: 2` |
 
 Luu y: crackme1 phu thuoc ComputerName. Neu chay tren may khac, serial co the khac.
 
@@ -102,7 +102,7 @@ Chi nen tu cham 100% khi co anh runtime success that cho ca 4 crackme. Neu crack
 
 ## 5. Cach lam crackme4 chac hon khi bao cao
 
-Keygen crackme4 hien mac dinh dung `Day: 2` de tao serial minh hoa `T10-67E7`. Cac nhanh da implement: Sunday `0`, Monday `1`, Tuesday `2`, Wednesday `3`, Thursday `4`, Friday `5`. Saturday `6` chua implement vi nhanh goc lon hon va dung custom hash phuc tap.
+Keygen crackme4 hien mac dinh dung `Day: 2` de tao serial minh hoa `T10-62E2`. Cac nhanh da implement: Sunday `0`, Monday `1`, Tuesday `2`, Wednesday `3`, Thursday `4`, Friday `5`. Saturday `6` chua implement vi nhanh goc lon hon va dung custom hash phuc tap.
 
 Khi chup anh runtime success, nen lam trong moi truong kiem soat:
 
