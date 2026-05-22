@@ -3,6 +3,7 @@ import ctypes
 import datetime as dt
 
 MASK32 = 0xFFFFFFFF
+DEFAULT_DAY = 2
 
 
 def bswap32(value: int) -> int:
@@ -83,7 +84,7 @@ def current_windows_day() -> int:
 
 
 def generate_key(username: str, day: int | None = None) -> str:
-    selected_day = current_windows_day() if day is None else day
+    selected_day = DEFAULT_DAY if day is None else day
     if selected_day == 0:
         return "A10-57617274-686F67"
     if selected_day == 2:
@@ -109,13 +110,28 @@ def generate_key(username: str, day: int | None = None) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Keygen for Crackme 4 / WhichKeyIsIt.")
     parser.add_argument("username", nargs="?", help="Username entered in the crackme.")
-    parser.add_argument("--day", type=int, choices=range(7), help="Windows day of week: Sunday=0 ... Saturday=6.")
+    parser.add_argument(
+        "--day",
+        type=int,
+        choices=range(7),
+        default=DEFAULT_DAY,
+        help="Windows day of week: Sunday=0 ... Saturday=6. Default: 2 (verified Tuesday branch).",
+    )
+    parser.add_argument(
+        "--current-day",
+        action="store_true",
+        help="Use today's Windows day instead of the default verified Tuesday branch.",
+    )
     args = parser.parse_args()
 
     username = args.username or input("Username: ").strip()
-    serial = generate_key(username, args.day)
+    day = current_windows_day() if args.current_day else args.day
+    try:
+        serial = generate_key(username, day)
+    except (RuntimeError, ValueError) as exc:
+        parser.exit(1, f"Error: {exc}\n")
     print(f"Username: {username}")
-    print(f"Day: {current_windows_day() if args.day is None else args.day}")
+    print(f"Day: {day}")
     print(f"Serial: {serial}")
 
 

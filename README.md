@@ -20,7 +20,7 @@ Dự án được tổ chức thành các thư mục như sau:
 - 📁 **`24120029_24120070/`**: Thư mục chính của nhóm sinh viên.
   - 📄 `24120029_24120070.docx`: Báo cáo chi tiết toàn bộ quá trình phân tích, trace code và phương pháp sinh key.
   - 📁 `Keygen/`: Chứa mã nguồn Python (`keygen.py`) và file thực thi (`keygen.exe`) của các công cụ Keygen tương ứng với 4 bài crackme (crackme1 -> crackme4).
-- 📁 **`Project crack phan mem/`**: Chứa các file crackme gốc (mục tiêu cần dịch ngược) và báo cáo dự án tổng quan (`Do_An_Crack_PhanMem.docx`).
+- 📁 **`Project crack phan mem/`**: Chứa các file crackme gốc đang có trong workspace. Riêng crackme2 không còn file `errors_keygenme.exe`, nên phần phân tích dựa trên các file disassembly `crack2_asm_utf8*.txt`.
 - 📁 **`Tai lieu Crack/`**: Bộ công cụ và tài liệu hướng dẫn được sử dụng trong quá trình làm đồ án:
   - Các bài hướng dẫn cơ bản (*Basic Cracking Tutorial 1, 2, 3*).
   - Công cụ Debug: **OllyDbg**.
@@ -46,6 +46,11 @@ Mỗi mục tiêu (crackme) sẽ đi kèm một công cụ sinh khóa tương �
    ```
 3. Bạn có thể truyền thêm các tham số lệnh nếu muốn (sử dụng `python keygen.py -h` để xem chi tiết) hoặc chỉ cần nhập **Username** vào màn hình theo yêu cầu. Chương trình sẽ trả về **Serial / Key** tương ứng.
 *(Lưu ý: Một số bài toán lấy thông tin phần cứng hoặc tên máy tính (`ComputerName`) làm tham số đầu vào cho hàm băm).*
+
+### Lưu ý kiểm chứng
+- Crackme1 phụ thuộc `ComputerName`, vì vậy serial minh họa trong báo cáo khớp với máy `LAPTOPCUACUONG`.
+- Crackme4 phụ thuộc ngày trong tuần và CPUID. Keygen mặc định dùng nhánh Tuesday đã kiểm chứng để luôn sinh được serial minh họa; có thể dùng `--day` để chọn nhánh ngày khác đã implement.
+- Crackme2 chưa runtime-verify được trong workspace vì thiếu executable gốc, nhưng keygen và báo cáo đã giữ rõ phần rủi ro này.
 
 ### Cách 2: Chạy bằng file thực thi (EXE)
 Dành cho người dùng không cài đặt sẵn môi trường Python:
