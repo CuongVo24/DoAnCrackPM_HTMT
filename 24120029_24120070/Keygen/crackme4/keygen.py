@@ -107,6 +107,14 @@ def generate_key(username: str, day: int | None = None) -> str:
     raise RuntimeError(f"Day branch {selected_day} is not implemented in this keygen.")
 
 
+def pause_if_interactive(enabled: bool) -> None:
+    if enabled:
+        try:
+            input("\nPress Enter to exit...")
+        except EOFError:
+            pass
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Keygen for Crackme 4 / WhichKeyIsIt.")
     parser.add_argument("username", nargs="?", help="Username entered in the crackme.")
@@ -124,15 +132,19 @@ def main() -> None:
     )
     args = parser.parse_args()
 
+    interactive = args.username is None
     username = args.username or input("Username: ").strip()
     day = current_windows_day() if args.current_day else args.day
     try:
         serial = generate_key(username, day)
     except (RuntimeError, ValueError) as exc:
-        parser.exit(1, f"Error: {exc}\n")
+        print(f"Error: {exc}")
+        pause_if_interactive(interactive)
+        raise SystemExit(1)
     print(f"Username: {username}")
     print(f"Day: {day}")
     print(f"Serial: {serial}")
+    pause_if_interactive(interactive)
 
 
 if __name__ == "__main__":

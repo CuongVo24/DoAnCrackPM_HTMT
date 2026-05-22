@@ -82,17 +82,32 @@ def generate_key(username: str, computer_name: str | None = None) -> str:
     return f"{ecx:08X}-{edx:08X}-{edi:08X}-{esi:08X}"
 
 
+def pause_if_interactive(enabled: bool) -> None:
+    if enabled:
+        try:
+            input("\nPress Enter to exit...")
+        except EOFError:
+            pass
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Keygen for Crackme 1 / KeygenMe1.")
     parser.add_argument("username", nargs="?", help="Username entered in the crackme.")
     parser.add_argument("--computer-name", help="Override GetComputerNameA for reproducible report examples.")
     args = parser.parse_args()
 
+    interactive = args.username is None
     username = args.username or input("Username: ").strip()
-    serial = generate_key(username, args.computer_name)
+    try:
+        serial = generate_key(username, args.computer_name)
+    except (RuntimeError, ValueError, UnicodeError) as exc:
+        print(f"Error: {exc}")
+        pause_if_interactive(interactive)
+        raise SystemExit(1)
     print(f"Username: {username}")
     print(f"ComputerName: {args.computer_name or get_computer_name()}")
     print(f"Serial: {serial}")
+    pause_if_interactive(interactive)
 
 
 if __name__ == "__main__":

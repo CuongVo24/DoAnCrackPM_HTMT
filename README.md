@@ -56,6 +56,7 @@ Mỗi mục tiêu (crackme) sẽ đi kèm một công cụ sinh khóa tương �
 Dành cho người dùng không cài đặt sẵn môi trường Python:
 1. Truy cập vào các thư mục `crackme1`, `crackme2`...
 2. Chạy tệp `keygen.exe` và nhập các thông tin cần thiết.
+3. Nếu mở bằng double-click, cửa sổ sẽ giữ lại ở dòng `Press Enter to exit...` sau khi in serial; nhấn Enter thêm một lần để đóng. Nếu chạy từ Terminal với tham số username, ví dụ `keygen.exe 2412002924120070`, chương trình sẽ in kết quả rồi thoát ngay.
 
 ---
 *Thực hiện trong khuôn khổ môn học Hệ Thống Máy Tính (HTMT).*
