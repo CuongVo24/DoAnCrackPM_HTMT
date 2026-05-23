@@ -1,6 +1,7 @@
 import argparse
 import ctypes
 import datetime as dt
+import hashlib
 
 MASK32 = 0xFFFFFFFF
 DEFAULT_DAY = 2
@@ -78,6 +79,53 @@ def generate_tuesday_key(username: str) -> str:
     return f"T10-{value:04X}"
 
 
+def generate_monday_key(username: str) -> str:
+    data = username.encode("ascii", errors="strict")
+    if len(data) < 4:
+        raise ValueError("Monday branch requires at least 4 username characters.")
+
+    last = data[3] ^ 0x02
+    if last == 0x7F:
+        last = data[3] ^ 0x03
+    return "<3<3" + chr(last)
+
+
+def generate_wednesday_key(username: str) -> str:
+    data = username.encode("ascii", errors="strict")
+    if len(data) < 4:
+        raise ValueError("Wednesday branch requires at least 4 username characters.")
+
+    total = data[0] + data[1]
+    ax = (total * total) & 0xFFFF
+    al = ((ax & 0xFF) << 4) & 0xFF
+    al = (al + data[2]) & 0xFF
+    al ^= data[3]
+    ah = (ax >> 8) & 0xFF
+    ax = (al * ah) & 0xFFFF
+    al = ((ax & 0xFF) << 4) & 0xFF
+    al = (al + data[2] + data[0]) & 0xFF
+    answer = bswap32(((ax & 0xFF00) | al) & 0xFFFF) | ((ax & 0xFF00) | al)
+    return f"{answer & MASK32:08X}"
+
+
+def generate_thursday_key(username: str) -> str:
+    digest = hashlib.md5(username.encode("latin-1", errors="strict")).digest()
+    return (digest[8:16] + digest[:8]).hex().upper()
+
+
+def generate_friday_key(username: str) -> str:
+    total = 1
+    multi = 0
+    for byte in username.encode("latin-1", errors="strict"):
+        total += byte
+        multi += total
+
+    total %= 0xFFF1
+    multi %= 0xFFF1
+    value = ((multi << 16) + total) & MASK32
+    return f"{value:08X}-0400-0400-1229-03E9"
+
+
 def current_windows_day() -> int:
     # Windows SYSTEMTIME uses Sunday=0, Monday=1, ..., Saturday=6.
     return (dt.datetime.now().weekday() + 1) % 7
@@ -87,23 +135,18 @@ def generate_key(username: str, day: int | None = None) -> str:
     selected_day = DEFAULT_DAY if day is None else day
     if selected_day == 0:
         return "A10-57617274-686F67"
+    if selected_day == 1:
+        return generate_monday_key(username)
     if selected_day == 2:
         return generate_tuesday_key(username)
     if selected_day == 3:
-        data = username.encode("ascii", errors="strict")
-        if len(data) < 4:
-            raise ValueError("Wednesday branch requires at least 4 username characters.")
-        al = (data[0] + data[1]) & 0xFF
-        eax = (al * al) & 0xFFFF
-        al = ((eax & 0xFF) << 4) & 0xFF
-        al = (al + data[2]) & 0xFF
-        al ^= data[3]
-        ah = (eax >> 8) & 0xFF
-        eax = (al * ah) & 0xFFFF
-        al = ((eax & 0xFF) << 4) & 0xFF
-        al = (al + data[2] + data[0]) & 0xFF
-        original = (eax & 0xFFFFFF00) | al
-        return f"{(original ^ bswap32(original)):X}"
+        return generate_wednesday_key(username)
+    if selected_day == 4:
+        return generate_thursday_key(username)
+    if selected_day == 5:
+        return generate_friday_key(username)
+    if selected_day == 6:
+        raise RuntimeError("Saturday branch is not implemented; original uses a larger custom hash path.")
     raise RuntimeError(f"Day branch {selected_day} is not implemented in this keygen.")
 
 
