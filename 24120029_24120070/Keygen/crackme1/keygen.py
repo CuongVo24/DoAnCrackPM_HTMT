@@ -30,13 +30,18 @@ def get_computer_name() -> str:
 
 
 def machine_hash(computer_name: str) -> int:
-    data = computer_name.encode("mbcs", errors="ignore") + b"\x00\x00"
+    data = computer_name.encode("mbcs", errors="ignore") + (b"\x00" * 16)
     eax = ebx = ecx = edx = 0
     index = 0
 
-    while data[index] != 0 or data[index + 1] != 0:
-        al = ror(data[index], 4, 8)
-        dl = (~data[index + 1]) & 0xFF
+    while (data[index] | (data[index + 1] << 8)) != 0:
+        eax = (eax & 0xFFFFFF00) | data[index]
+        edx = (edx & 0xFFFFFF00) | data[index + 1]
+
+        al = ror(eax & 0xFF, 4, 8)
+        eax = (eax & 0xFFFFFF00) | al
+        dl = (~(edx & 0xFF)) & 0xFF
+        edx = (edx & 0xFFFFFF00) | dl
         al = (al + dl) & 0xFF
 
         eax = (eax & 0xFFFFFF00) | al
@@ -54,23 +59,25 @@ def generate_key(username: str, computer_name: str | None = None) -> str:
         raise ValueError("Username length must be from 4 to 32 characters.")
 
     mh = machine_hash(computer_name or get_computer_name())
-    user_bytes = username.encode("mbcs", errors="strict")
+    user_bytes = username.encode("mbcs", errors="strict") + b"\x00\x00"
     ebx, ecx, edx = 0, 0x7FFF, 0
+    index = 0
 
-    for index, char in enumerate(user_bytes):
-        next_char = user_bytes[index + 1] if index + 1 < len(user_bytes) else 0
-        bx = char | (next_char << 8)
-        ebx = (bx << 8) & MASK32
+    while user_bytes[index] != 0:
+        bx = user_bytes[index] | (user_bytes[index + 1] << 8)
+        ebx = (ebx & 0xFFFF0000) | bx
+        ebx = (ebx << 8) & MASK32
         eax = mh & 0x00F8F800
         ebx ^= eax
         ebx = (ebx + 0x006C6F6C) & MASK32
-        ebx ^= 0x10101010
+        ebx = (ebx ^ 0x10101010) & MASK32
 
         edx = (edx + ebx) & MASK32
         ecx = (ecx + ebx) & MASK32
         ecx = (ecx - 0x002D3D2D) & MASK32
         ecx = (ecx * 8) & MASK32
         ecx = (ecx + eax) & MASK32
+        index += 1
 
     esi = edi = 0
     for _ in range(0x10):

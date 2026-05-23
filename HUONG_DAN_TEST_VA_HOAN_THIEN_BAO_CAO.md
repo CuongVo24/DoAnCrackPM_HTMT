@@ -41,7 +41,7 @@ Ket qua mong doi tren may `LAPTOPCUACUONG`:
 
 | Crackme | Serial mong doi |
 |---|---|
-| crackme1 | `89041C38-13838BC0-686AA2A0-B9B75D5E` |
+| crackme1 | `1823E438-6D94BBC0-E1DFE0E1-0C17DFDC` |
 | crackme2 | `4642KL2673302MO7OKJ7` |
 | crackme3 | `tNrRu03bTDZPy59B` |
 | crackme4 | `T10-67E7` voi `Day: 2` |
