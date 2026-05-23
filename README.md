@@ -38,6 +38,8 @@ Dự án được tổ chức thành các thư mục như sau:
 
 Mỗi mục tiêu (crackme) sẽ đi kèm một công cụ sinh khóa tương ứng trong thư mục `Keygen/`. Bạn có thể chạy Keygen bằng Python hoặc sử dụng tệp tin thực thi độc lập (`.exe`).
 
+Xem thêm checklist test và hoàn thiện báo cáo tại [`HUONG_DAN_TEST_VA_HOAN_THIEN_BAO_CAO.md`](HUONG_DAN_TEST_VA_HOAN_THIEN_BAO_CAO.md).
+
 ### Cách 1: Chạy bằng mã nguồn Python
 1. Mở Terminal / Command Prompt tại thư mục chứa file `keygen.py` (Ví dụ: `24120029_24120070/Keygen/crackme1/`).
 2. Thực thi kịch bản bằng lệnh:
