@@ -5,6 +5,14 @@ import hashlib
 import sys
 from pathlib import Path
 
+"""Keygen for WhichKeyIsIt.exe.
+
+The target dispatches by Windows SYSTEMTIME.wDayOfWeek:
+Sunday=0, Monday=1, ..., Saturday=6.  This keygen implements the stable
+branches Sunday-Friday and deliberately reports Saturday as unsupported because
+that branch lives in helper.dll and uses a larger custom hash path.
+"""
+
 MASK32 = 0xFFFFFFFF
 MONDAY_KEYFILE_NAME = "xor0.rox"
 MONDAY_KEYFILE = bytes.fromhex(
@@ -64,6 +72,7 @@ def cpu_mix_value() -> int:
 
 
 def generate_tuesday_key(username: str) -> str:
+    """Day 2: CPUID mix + 32-byte repeated username + 0xB00B accumulator."""
     if not username:
         raise ValueError("Username must not be empty.")
 
@@ -90,6 +99,7 @@ def generate_tuesday_key(username: str) -> str:
 
 
 def generate_monday_key(username: str) -> str:
+    """Day 1: '<3<3X' serial plus the xor0.rox sidecar file check."""
     data = username.encode("ascii", errors="strict")
     if len(data) < 4:
         raise ValueError("Monday branch requires at least 4 username characters.")
@@ -107,6 +117,7 @@ def application_dir() -> Path:
 
 
 def monday_keyfile_targets() -> list[Path]:
+    """Return likely locations where WhichKeyIsIt.exe will look for xor0.rox."""
     roots = [Path.cwd(), application_dir()]
     roots.extend(Path.cwd().parents)
     roots.extend(application_dir().parents)
@@ -144,6 +155,7 @@ def write_monday_keyfiles() -> list[Path]:
 
 
 def generate_wednesday_key(username: str) -> str:
+    """Day 3: arithmetic/XOR transform of the first four username bytes."""
     data = username.encode("ascii", errors="strict")
     if len(data) < 4:
         raise ValueError("Wednesday branch requires at least 4 username characters.")
@@ -162,11 +174,13 @@ def generate_wednesday_key(username: str) -> str:
 
 
 def generate_thursday_key(username: str) -> str:
+    """Day 4: MD5(username), then swap the two 8-byte halves of the digest."""
     digest = hashlib.md5(username.encode("latin-1", errors="strict")).digest()
     return (digest[8:16] + digest[:8]).hex().upper()
 
 
 def generate_friday_key(username: str) -> str:
+    """Day 5: Adler-32-like checksum formatted with fixed GUID-like parts."""
     total = 1
     multi = 0
     for byte in username.encode("latin-1", errors="strict"):

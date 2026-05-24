@@ -1,5 +1,13 @@
 import argparse
 
+"""Keygen for d2k2.crkme.09.exe.
+
+The crackme uses a fixed 62-character alphabet.  It rotates that alphabet
+based on the username length, then transforms each character with XOR and a
+running DL accumulator.  The generated serial is the inverse lookup that makes
+the target's transformed value match the input name.
+"""
+
 ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 
@@ -13,6 +21,7 @@ def rotate(text: str, offset: int) -> str:
 
 
 def build_table(username: str) -> str:
+    """Rotate the alphabet exactly like the target's length-dependent table."""
     offset = len(username) * 4
     if offset > 0x3C:
         offset = 0x1E
@@ -20,6 +29,7 @@ def build_table(username: str) -> str:
 
 
 def transform_username(username: str, table: str) -> str:
+    """Mirror the target loop that XORs adjacent bytes and indexes the table."""
     data = username.encode("ascii") + b"\x00"
     dl = rol8(data[0], 3)
     output = []
@@ -43,6 +53,8 @@ def generate_key(username: str) -> str:
     transformed = transform_username(username, table)
     serial = []
 
+    # Invert the target comparison: choose a serial character whose table index
+    # combines with the transformed username character to satisfy the check.
     for plain_char, transformed_char in zip(username, transformed):
         transformed_index = table.index(transformed_char)
         plain_index = table.index(plain_char)

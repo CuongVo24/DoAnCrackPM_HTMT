@@ -1,5 +1,12 @@
 import argparse
 
+"""Keygen for errors_keygenme.exe.
+
+The target first pads the username like a one-block SHA-1 message and then
+runs an 80-round compression loop.  The digest is not printed as normal hex:
+each output byte is reduced to its low nibble and mapped to 0-9 or J-O.
+"""
+
 MASK32 = 0xFFFFFFFF
 
 
@@ -25,6 +32,7 @@ def bswap32(value: int) -> int:
 
 
 def build_message_schedule(username: str) -> list[int]:
+    """Build the 80-word schedule used by the target's SHA-1-like loop."""
     data = username.encode("latin-1", errors="strict")
     if not data:
         raise ValueError("Username must not be empty.")
@@ -50,6 +58,8 @@ def generate_key(username: str) -> str:
     initial = [0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476, 0xC3D2E1F0]
     a, b, c, d, e = initial
 
+    # Compression loop at the core of crackme2.  The constants and boolean
+    # functions follow SHA-1, but the final serial mapping is custom.
     for index in range(80):
         if index < 20:
             f = (b & c) | ((~b) & d)
@@ -69,6 +79,7 @@ def generate_key(username: str) -> str:
 
     digest_words = [u32(left + right) for left, right in zip(initial, [a, b, c, d, e])]
     serial = []
+    # Custom mapping: low nibble 0..9 -> '0'..'9', 10..15 -> 'J'..'O'.
     for word in digest_words:
         for byte in word.to_bytes(4, "little"):
             nibble = byte & 0x0F

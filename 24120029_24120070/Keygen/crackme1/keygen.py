@@ -3,6 +3,14 @@ import ctypes
 import platform
 import struct
 
+"""Keygen for KeygenMe1.exe.
+
+The original crackme derives the displayed ID from GetComputerNameA, then
+mixes that machine hash with every byte of the user name.  This script keeps
+the same dependency on the Windows computer name so the generated serial
+matches the target on the machine used for testing.
+"""
+
 MASK32 = 0xFFFFFFFF
 
 
@@ -30,6 +38,7 @@ def get_computer_name() -> str:
 
 
 def machine_hash(computer_name: str) -> int:
+    """Rebuild the ComputerName -> Machine ID routine used by the target."""
     data = computer_name.encode("mbcs", errors="ignore") + (b"\x00" * 16)
     eax = ebx = ecx = edx = 0
     index = 0
@@ -55,6 +64,7 @@ def machine_hash(computer_name: str) -> int:
 
 
 def generate_key(username: str, computer_name: str | None = None) -> str:
+    """Generate the four-DWORD serial shown as XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX."""
     if not 4 <= len(username) <= 32:
         raise ValueError("Username length must be from 4 to 32 characters.")
 
@@ -63,6 +73,8 @@ def generate_key(username: str, computer_name: str | None = None) -> str:
     ebx, ecx, edx = 0, 0x7FFF, 0
     index = 0
 
+    # Main username loop at 0x4011A2..0x401203: pair adjacent bytes, mix them
+    # with the machine hash, then accumulate ECX/EDX.
     while user_bytes[index] != 0:
         bx = user_bytes[index] | (user_bytes[index + 1] << 8)
         ebx = (ebx & 0xFFFF0000) | bx
@@ -79,6 +91,8 @@ def generate_key(username: str, computer_name: str | None = None) -> str:
         ecx = (ecx + eax) & MASK32
         index += 1
 
+    # Final 16 rounds use BSWAP + rotate instructions to form the last two
+    # DWORDs of the displayed serial.
     esi = edi = 0
     for _ in range(0x10):
         edi = (edi + ecx) & MASK32
