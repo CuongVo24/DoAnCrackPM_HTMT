@@ -33,11 +33,11 @@
   ```
 
   **Ảnh minh chứng quá trình phân tích:**
-  *Hình 1.1: Crackme1 trong debugger tại vùng sinh serial. Chương trình đọc Name bằng GetDlgItemTextA, lấy machine_hash từ 0x4042C4, sau đó dùng các lệnh AND, XOR, ADD để trộn username với giá trị phụ thuộc ComputerName.*
+  *Hình 1.1: Crackme1 tại vùng sinh serial chính quanh `0x4011A2-0x401203`. Sau khi đọc Name bằng `GetDlgItemTextA`, chương trình lấy `machine_hash` đã lưu ở `0x4042C4`, rồi lần lượt dùng `AND 0F8F800h`, `XOR`, `ADD 6C6F6Ch` và `XOR 10101010h` để trộn dữ liệu username với giá trị phụ thuộc ComputerName.*
   
   ![crackme1_disasm_generate](minh_chung/crackme1_disasm_generate.png)
   
-  *Hình 1.2: Vòng lặp so sánh serial sinh ra ở 0x4042CB với serial người dùng nhập ở 0x404293 (dùng lệnh CMP AL, DL).*
+  *Hình 1.2: Vòng lặp kiểm tra serial của Crackme1. Buffer serial đúng được sinh ra tại vùng `0x4042CB`, serial người dùng nhập nằm ở `0x404293`; đoạn code đọc từng byte, dùng `CMP AL, DL` để so sánh và chỉ nhảy sang nhánh thành công khi toàn bộ chuỗi khớp.*
   
   ![crackme1_disasm_compare](minh_chung/crackme1_disasm_compare.png)
 
@@ -113,17 +113,19 @@
   ```
 
   **Ảnh minh chứng quá trình phân tích:**
-  *Hình 2.1: Cơ chế Anti-Debug (SEH). Đẩy địa chỉ hàm xử lý ngoại lệ vào stack rồi gọi `IN EAX, DX` để tạo Exception.*
+  *Hình 2.1: Cơ chế Anti-Debug/SEH của Crackme2. Chương trình chủ động cài địa chỉ handler ngoại lệ lên stack, sau đó thực thi lệnh đặc quyền `IN EAX, DX` để tạo exception; luồng xử lý thật không đi tuyến tính qua disassembly ban đầu mà được chuyển vào handler, vì vậy cần theo dõi SEH để tiếp tục phân tích thuật toán sinh serial.*
   
   ![crackme2_disasm_antidebug](minh_chung/crackme2_disasm_antidebug.png)
 
-  *Hình 2.2: Phần cuối vòng lặp SHA-1 (80 vòng).*
+  *Hình 2.2: Phần cuối vòng nén 80 round của Crackme2. Điều kiện `CMP ECX, 50h` cho thấy vòng lặp chạy 80 lần giống cấu trúc SHA-1; trong mỗi round chương trình cập nhật các thanh ghi trạng thái bằng xoay bit, cộng hằng số và trộn dữ liệu block username đã padding.*
   
   ![crackme2_disasm_sha1_loop](minh_chung/crackme2_disasm_sha1_loop.png)
 
-  *Hình 2.3: Vòng lặp ánh xạ 20 ký tự (Custom Mapping).*
+  *Hình 2.3a: Bắt đầu đoạn ánh xạ digest sang serial ở Crackme2. `EDI` trỏ tới buffer kết quả, `ECX = 14h` cho biết chương trình lặp 20 lần tương ứng 20 byte digest; mỗi byte chỉ lấy nibble thấp để đổi thành ký tự serial.*
   
   ![crackme2_disasm_custom_mapping_1](minh_chung/crackme2_disasm_custom_mapping_1.png)
+
+  *Hình 2.3b: Nhánh quyết định ký tự trong Custom Mapping. Nếu nibble `<= 9` thì cộng `0x30` để ra ký tự `'0'..'9'`; nếu nibble `> 9` thì cộng `0x40` để ra nhóm ký tự `'J'..'O'`, tạo serial dạng 20 ký tự như `4642KL2673302MO7OKJ7`.*
   
   ![crackme2_disasm_custom_mapping_2](minh_chung/crackme2_disasm_custom_mapping_2.png)
 
@@ -184,15 +186,15 @@
   - Chương trình gọi hàm lấy độ dài Username ở `0x4010CA`. Nếu rỗng báo lỗi. Tiếp theo gọi hàm tính toán thuật toán tại `0x4011FF`. Thuật toán thực hiện việc dịch xoay (rotate) bảng ký tự này phụ thuộc vào độ dài của Username, tối đa xoay `0x3C` vị trí.
   
   **Ảnh minh chứng quá trình phân tích:**
-  *Hình 3.1: Nạp bảng ký tự (alphabet) vào bộ nhớ tại mốc 0x4010CA.*
+  *Hình 3.1: Crackme3 nạp bảng ký tự cố định `0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ` vào bộ nhớ. Bảng này là cơ sở để tra cứu và sinh serial; vì vậy serial hợp lệ không phải hex thuần mà là chuỗi được chọn từ alphabet 62 ký tự.*
   
   ![crackme3_disasm_table](minh_chung/crackme3_disasm_table.png)
 
-  *Hình 3.2: Kiểm tra độ dài chuỗi nhập vào.*
+  *Hình 3.2: Đoạn kiểm tra input của Crackme3. Chương trình lấy độ dài Name, loại trường hợp rỗng hoặc không hợp lệ, sau đó dùng độ dài này làm tham số tính offset xoay bảng trước khi sinh serial.*
   
   ![crackme3_disasm_serial_check](minh_chung/crackme3_disasm_serial_check.png)
 
-  *Hình 3.3: Thuật toán cốt lõi. Nửa trên là vòng lặp đọc từng ký tự Username XOR với ký tự tiếp theo và tra bảng. Nửa dưới tính offset xoay bảng (SHL EAX, 2).*
+  *Hình 3.3: Thuật toán cốt lõi của Crackme3. Phần đầu vòng lặp lấy từng ký tự username, XOR với ký tự kế tiếp, cộng dồn vào thanh ghi trung gian rồi tra bảng alphabet đã xoay; phần dưới tính offset xoay bằng `len(username) * 4` (`SHL EAX, 2`) và nếu vượt `0x3C` thì rút về `0x1E`.*
   
   ![crackme3_disasm_loop](minh_chung/crackme3_disasm_loop.png)
 
@@ -256,11 +258,11 @@
   - Nhánh Tuesday được gọi từ `0x100051C9` sang hàm `0x100010D9`. Trong hàm này có hai lệnh `CPUID` tại `0x1000110B` và `0x10001119`, sau đó vòng lặp tích lũy bắt đầu quanh `0x10001143` với hằng `0xB00B`.
 
   **Ảnh minh chứng quá trình phân tích:**
-  *Hình 4.1: Dispatcher của Crackme4 trong `helper.dll` tại `0x10005189`. Hàm gọi `GetLocalTime`, lấy cấu trúc thời gian vào vùng `0x1000E365`, đọc `wDayOfWeek` tại `[EDI+4]`, rồi so sánh `AL` lần lượt với `0..6` để rẽ sang thuật toán tương ứng từng ngày.*
+  *Hình 4.1: Dispatcher của Crackme4 trong `helper.dll` tại `0x10005189`. Hàm gọi `GetLocalTime`, ghi cấu trúc thời gian vào vùng `0x1000E365`, đọc trường `wDayOfWeek` tại `[EDI+4]`, rồi so sánh `AL` lần lượt với `0..6`; đây là bằng chứng mỗi ngày trong tuần được rẽ sang một thuật toán sinh serial riêng.*
 
   ![crackme4_disasm_day_dispatcher](minh_chung/crackme4_disasm_day_dispatcher.png)
 
-  *Hình 4.2: Nhánh Tuesday trong `helper.dll`. Đoạn code sử dụng hai lệnh `CPUID` tại `0x1000110B` và `0x10001119`, kết hợp `BSWAP`, `XOR` để tạo giá trị trộn theo CPU; sau đó vòng lặp tại `0x10001143` dùng hằng `0xB00B` để tích lũy và kiểm tra serial dạng `T10-XXXX`.*
+  *Hình 4.2: Nhánh Tuesday trong `helper.dll`. Đoạn code sử dụng hai lệnh `CPUID` tại `0x1000110B` và `0x10001119` để lấy giá trị phụ thuộc CPU, sau đó dùng `BSWAP`, `XOR` và vòng lặp tích lũy quanh `0x10001143` với hằng `0xB00B`; kết quả cuối cùng được rút gọn thành serial dạng `T10-XXXX`, ví dụ `T10-62E2`.*
 
   ![crackme4_disasm_tuesday_cpuid](minh_chung/crackme4_disasm_tuesday_cpuid.png)
 
