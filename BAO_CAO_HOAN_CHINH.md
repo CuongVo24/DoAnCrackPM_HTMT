@@ -33,13 +33,13 @@
   ```
 
   **Ảnh minh chứng quá trình phân tích:**
-  *Hình 1.1: Crackme1 tại vùng sinh serial chính quanh `0x4011A2-0x401203`. Sau khi đọc Name bằng `GetDlgItemTextA`, chương trình lấy `machine_hash` đã lưu ở `0x4042C4`, rồi lần lượt dùng `AND 0F8F800h`, `XOR`, `ADD 6C6F6Ch` và `XOR 10101010h` để trộn dữ liệu username với giá trị phụ thuộc ComputerName.*
-  
   ![crackme1_disasm_generate](minh_chung/crackme1_disasm_generate.png)
   
-  *Hình 1.2: Vòng lặp kiểm tra serial của Crackme1. Buffer serial đúng được sinh ra tại vùng `0x4042CB`, serial người dùng nhập nằm ở `0x404293`; đoạn code đọc từng byte, dùng `CMP AL, DL` để so sánh và chỉ nhảy sang nhánh thành công khi toàn bộ chuỗi khớp.*
+  *Hình 1.1: Crackme1 tại vùng sinh serial chính quanh `0x4011A2-0x401203`. Sau khi đọc Name bằng `GetDlgItemTextA`, chương trình lấy `machine_hash` đã lưu ở `0x4042C4`, rồi lần lượt dùng `AND 0F8F800h`, `XOR`, `ADD 6C6F6Ch` và `XOR 10101010h` để trộn dữ liệu username với giá trị phụ thuộc ComputerName.*
   
   ![crackme1_disasm_compare](minh_chung/crackme1_disasm_compare.png)
+  
+  *Hình 1.2: Vòng lặp kiểm tra serial của Crackme1. Buffer serial đúng được sinh ra tại vùng `0x4042CB`, serial người dùng nhập nằm ở `0x404293`; đoạn code đọc từng byte, dùng `CMP AL, DL` để so sánh và chỉ nhảy sang nhánh thành công khi toàn bộ chuỗi khớp.*
 
 ### Bước 2 — Giải Thích Ý Nghĩa Thuật Toán
 - **Giải thích:** Crackme1 yêu cầu nhập Name và Serial. Tuy nhiên, Serial hợp lệ không chỉ phụ thuộc vào Username mà còn phụ thuộc vào một ID sinh ra từ tên máy (ComputerName) thông qua hàm `GetComputerNameA`.
@@ -72,9 +72,9 @@
   - Các phép XOR/ADD lặp qua chuỗi "2412002924120070" cộng dồn tạo ra 4 DWORD.
 - **Serial tính toán tương ứng:** `1823E438-6D94BBC0-E1DFE0E1-0C17DFDC`
 - **Ảnh minh chứng khi nhập vào crackme:**
-  *Hình 1.3: Thông báo "Serial is correct!" khi nhập đúng Username và Serial tương ứng với ComputerName.*
-  
   ![crackme1_success](minh_chung/crackme1_success.png)
+  
+  *Hình 1.3: Thông báo "Serial is correct!" khi nhập đúng Username và Serial tương ứng với ComputerName.*
 
 ### Bước 4 — Viết Chương Trình Keygen Hoàn Chỉnh
 - **Ngôn ngữ:** Python
@@ -84,9 +84,9 @@
   .\24120029_24120070\Keygen\crackme1\keygen.exe 2412002924120070
   ```
 - **Kết quả hiển thị từ Keygen:**
-  *Hình 1.4: Keygen tự động lấy ComputerName và sinh ra Serial.*
-  
   ![crackme1_keygen](minh_chung/crackme1_keygen.png)
+  
+  *Hình 1.4: Keygen tự động lấy ComputerName và sinh ra Serial.*
 
 ---
 
@@ -113,21 +113,21 @@
   ```
 
   **Ảnh minh chứng quá trình phân tích:**
-  *Hình 2.1: Cơ chế Anti-Debug/SEH của Crackme2. Chương trình chủ động cài địa chỉ handler ngoại lệ lên stack, sau đó thực thi lệnh đặc quyền `IN EAX, DX` để tạo exception; luồng xử lý thật không đi tuyến tính qua disassembly ban đầu mà được chuyển vào handler, vì vậy cần theo dõi SEH để tiếp tục phân tích thuật toán sinh serial.*
-  
   ![crackme2_disasm_antidebug](minh_chung/crackme2_disasm_antidebug.png)
-
-  *Hình 2.2: Phần cuối vòng nén 80 round của Crackme2. Điều kiện `CMP ECX, 50h` cho thấy vòng lặp chạy 80 lần giống cấu trúc SHA-1; trong mỗi round chương trình cập nhật các thanh ghi trạng thái bằng xoay bit, cộng hằng số và trộn dữ liệu block username đã padding.*
   
+  *Hình 2.1: Cơ chế Anti-Debug/SEH của Crackme2. Chương trình chủ động cài địa chỉ handler ngoại lệ lên stack, sau đó thực thi lệnh đặc quyền `IN EAX, DX` để tạo exception; luồng xử lý thật không đi tuyến tính qua disassembly ban đầu mà được chuyển vào handler, vì vậy cần theo dõi SEH để tiếp tục phân tích thuật toán sinh serial.*
+
   ![crackme2_disasm_sha1_loop](minh_chung/crackme2_disasm_sha1_loop.png)
-
-  *Hình 2.3a: Bắt đầu đoạn ánh xạ digest sang serial ở Crackme2. `EDI` trỏ tới buffer kết quả, `ECX = 14h` cho biết chương trình lặp 20 lần tương ứng 20 byte digest; mỗi byte chỉ lấy nibble thấp để đổi thành ký tự serial.*
   
+  *Hình 2.2: Phần cuối vòng nén 80 round của Crackme2. Điều kiện `CMP ECX, 50h` cho thấy vòng lặp chạy 80 lần giống cấu trúc SHA-1; trong mỗi round chương trình cập nhật các thanh ghi trạng thái bằng xoay bit, cộng hằng số và trộn dữ liệu block username đã padding.*
+
   ![crackme2_disasm_custom_mapping_1](minh_chung/crackme2_disasm_custom_mapping_1.png)
-
-  *Hình 2.3b: Nhánh quyết định ký tự trong Custom Mapping. Nếu nibble `<= 9` thì cộng `0x30` để ra ký tự `'0'..'9'`; nếu nibble `> 9` thì cộng `0x40` để ra nhóm ký tự `'J'..'O'`, tạo serial dạng 20 ký tự như `4642KL2673302MO7OKJ7`.*
   
+  *Hình 2.3a: Bắt đầu đoạn ánh xạ digest sang serial ở Crackme2. `EDI` trỏ tới buffer kết quả, `ECX = 14h` cho biết chương trình lặp 20 lần tương ứng 20 byte digest; mỗi byte chỉ lấy nibble thấp để đổi thành ký tự serial.*
+
   ![crackme2_disasm_custom_mapping_2](minh_chung/crackme2_disasm_custom_mapping_2.png)
+  
+  *Hình 2.3b: Nhánh quyết định ký tự trong Custom Mapping. Nếu nibble `<= 9` thì cộng `0x30` để ra ký tự `'0'..'9'`; nếu nibble `> 9` thì cộng `0x40` để ra nhóm ký tự `'J'..'O'`, tạo serial dạng 20 ký tự như `4642KL2673302MO7OKJ7`.*
 
 ### Bước 2 — Giải Thích Ý Nghĩa Thuật Toán
 - **Giải thích:** Đầu tiên thuật toán đệm (pad) Username tương tự một block trong SHA-1 và chạy vòng nén 80 round chuẩn của SHA-1 để tạo digest gồm 5 biến trạng thái (20 byte). Tuy nhiên, phần xuất Serial không xuất mã Hex chuẩn, mà dùng cơ chế Custom Hash Mapping: nó duyệt 20 byte của digest, lấy nibble thấp của từng byte; nếu giá trị từ 0-9 thì đổi thành '0'-'9', nếu từ 10-15 thì đổi thành 'J'-'O'.
@@ -158,9 +158,9 @@
   - Lấy 20 byte kết quả. Áp dụng ánh xạ: `0x06` -> `'6'`, `0x0F` -> `'O'`, `0x0B` -> `'K'`, v.v...
 - **Serial tính toán tương ứng:** `4642KL2673302MO7OKJ7`
 - **Ảnh minh chứng khi nhập vào crackme:**
-  *Hình 2.4: Thông báo "Good Boy! Nice shoot!" báo hiệu crackme2 thành công.*
-  
   ![crackme2_success](minh_chung/crackme2_success.png)
+  
+  *Hình 2.4: Thông báo "Good Boy! Nice shoot!" báo hiệu crackme2 thành công.*
 
 ### Bước 4 — Viết Chương Trình Keygen Hoàn Chỉnh
 - **Ngôn ngữ:** Python
@@ -170,9 +170,9 @@
   .\24120029_24120070\Keygen\crackme2\keygen.exe 2412002924120070
   ```
 - **Kết quả hiển thị từ Keygen:**
-  *Hình 2.5: Keygen2 sinh chuỗi Serial 20 ký tự.*
-  
   ![crackme2_keygen](minh_chung/crackme2_keygen.png)
+  
+  *Hình 2.5: Keygen2 sinh chuỗi Serial 20 ký tự.*
 
 ---
 
@@ -186,17 +186,17 @@
   - Chương trình gọi hàm lấy độ dài Username ở `0x4010CA`. Nếu rỗng báo lỗi. Tiếp theo gọi hàm tính toán thuật toán tại `0x4011FF`. Thuật toán thực hiện việc dịch xoay (rotate) bảng ký tự này phụ thuộc vào độ dài của Username, tối đa xoay `0x3C` vị trí.
   
   **Ảnh minh chứng quá trình phân tích:**
-  *Hình 3.1: Crackme3 nạp bảng ký tự cố định `0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ` vào bộ nhớ. Bảng này là cơ sở để tra cứu và sinh serial; vì vậy serial hợp lệ không phải hex thuần mà là chuỗi được chọn từ alphabet 62 ký tự.*
-  
   ![crackme3_disasm_table](minh_chung/crackme3_disasm_table.png)
-
-  *Hình 3.2: Đoạn kiểm tra input của Crackme3. Chương trình lấy độ dài Name, loại trường hợp rỗng hoặc không hợp lệ, sau đó dùng độ dài này làm tham số tính offset xoay bảng trước khi sinh serial.*
   
+  *Hình 3.1: Crackme3 nạp bảng ký tự cố định `0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ` vào bộ nhớ. Bảng này là cơ sở để tra cứu và sinh serial; vì vậy serial hợp lệ không phải hex thuần mà là chuỗi được chọn từ alphabet 62 ký tự.*
+
   ![crackme3_disasm_serial_check](minh_chung/crackme3_disasm_serial_check.png)
-
-  *Hình 3.3: Thuật toán cốt lõi của Crackme3. Phần đầu vòng lặp lấy từng ký tự username, XOR với ký tự kế tiếp, cộng dồn vào thanh ghi trung gian rồi tra bảng alphabet đã xoay; phần dưới tính offset xoay bằng `len(username) * 4` (`SHL EAX, 2`) và nếu vượt `0x3C` thì rút về `0x1E`.*
   
+  *Hình 3.2: Đoạn kiểm tra input của Crackme3. Chương trình lấy độ dài Name, loại trường hợp rỗng hoặc không hợp lệ, sau đó dùng độ dài này làm tham số tính offset xoay bảng trước khi sinh serial.*
+
   ![crackme3_disasm_loop](minh_chung/crackme3_disasm_loop.png)
+  
+  *Hình 3.3: Thuật toán cốt lõi của Crackme3. Phần đầu vòng lặp lấy từng ký tự username, XOR với ký tự kế tiếp, cộng dồn vào thanh ghi trung gian rồi tra bảng alphabet đã xoay; phần dưới tính offset xoay bằng `len(username) * 4` (`SHL EAX, 2`) và nếu vượt `0x3C` thì rút về `0x1E`.*
 
 ### Bước 2 — Giải Thích Ý Nghĩa Thuật Toán
 - **Giải thích:** Username nhập vào chỉ hợp lệ nếu tất cả ký tự nằm trong bảng Alphabet trên.
@@ -229,9 +229,9 @@
   - Áp dụng các biến đổi XOR từng byte của chuỗi để tra cứu bảng mới, ra chuỗi kết quả.
 - **Serial tính toán tương ứng:** `tNrRu03bTDZPy59B`
 - **Ảnh minh chứng khi nhập vào crackme:**
-  *Hình 3.4: Thông báo "Serial is OK" khi crack thành công.*
-  
   ![crackme3_success](minh_chung/crackme3_success.png)
+  
+  *Hình 3.4: Thông báo "Serial is OK" khi crack thành công.*
 
 ### Bước 4 — Viết Chương Trình Keygen Hoàn Chỉnh
 - **Ngôn ngữ:** Python
@@ -240,9 +240,9 @@
   .\24120029_24120070\Keygen\crackme3\keygen.exe 2412002924120070
   ```
 - **Kết quả hiển thị từ Keygen:**
-  *Hình 3.5: Keygen sinh serial dựa trên bảng ký tự tĩnh đã xoay.*
-  
   ![crackme3_keygen](minh_chung/crackme3_keygen.png)
+  
+  *Hình 3.5: Keygen sinh serial dựa trên bảng ký tự tĩnh đã xoay.*
 
 ---
 
@@ -258,13 +258,13 @@
   - Nhánh Tuesday được gọi từ `0x100051C9` sang hàm `0x100010D9`. Trong hàm này có hai lệnh `CPUID` tại `0x1000110B` và `0x10001119`, sau đó vòng lặp tích lũy bắt đầu quanh `0x10001143` với hằng `0xB00B`.
 
   **Ảnh minh chứng quá trình phân tích:**
-  *Hình 4.1: Dispatcher của Crackme4 trong `helper.dll` tại `0x10005189`. Hàm gọi `GetLocalTime`, ghi cấu trúc thời gian vào vùng `0x1000E365`, đọc trường `wDayOfWeek` tại `[EDI+4]`, rồi so sánh `AL` lần lượt với `0..6`; đây là bằng chứng mỗi ngày trong tuần được rẽ sang một thuật toán sinh serial riêng.*
-
   ![crackme4_disasm_day_dispatcher](minh_chung/crackme4_disasm_day_dispatcher.png)
 
-  *Hình 4.2: Nhánh Tuesday trong `helper.dll`. Đoạn code sử dụng hai lệnh `CPUID` tại `0x1000110B` và `0x10001119` để lấy giá trị phụ thuộc CPU, sau đó dùng `BSWAP`, `XOR` và vòng lặp tích lũy quanh `0x10001143` với hằng `0xB00B`; kết quả cuối cùng được rút gọn thành serial dạng `T10-XXXX`, ví dụ `T10-62E2`.*
+  *Hình 4.1: Dispatcher của Crackme4 trong `helper.dll` tại `0x10005189`. Hàm gọi `GetLocalTime`, ghi cấu trúc thời gian vào vùng `0x1000E365`, đọc trường `wDayOfWeek` tại `[EDI+4]`, rồi so sánh `AL` lần lượt với `0..6`; đây là bằng chứng mỗi ngày trong tuần được rẽ sang một thuật toán sinh serial riêng.*
 
   ![crackme4_disasm_tuesday_cpuid](minh_chung/crackme4_disasm_tuesday_cpuid.png)
+
+  *Hình 4.2: Nhánh Tuesday trong `helper.dll`. Đoạn code sử dụng hai lệnh `CPUID` tại `0x1000110B` và `0x10001119` để lấy giá trị phụ thuộc CPU, sau đó dùng `BSWAP`, `XOR` và vòng lặp tích lũy quanh `0x10001143` với hằng `0xB00B`; kết quả cuối cùng được rút gọn thành serial dạng `T10-XXXX`, ví dụ `T10-62E2`.*
 
 ### Bước 2 — Giải Thích Ý Nghĩa Thuật Toán
 - **Cơ chế rẽ nhánh theo ngày:** Crackme4 lấy `wDayOfWeek` của Windows rồi chọn thuật toán tương ứng. Quy ước của Windows là `Sunday=0`, `Monday=1`, `Tuesday=2`, `Wednesday=3`, `Thursday=4`, `Friday=5`, `Saturday=6`. Vì vậy cùng một Username có thể cần Serial khác nhau nếu chạy target vào ngày khác.
@@ -315,53 +315,53 @@
   | 5 | Friday | `1AC30325-0400-0400-1229-03E9` |
 
 - **Ảnh minh chứng khi nhập vào crackme:**
-  *Hình 4.3: Keygen sinh serial hằng `A10-57617274-686F67` cho Day 0 (Sunday).*
-
   ![crackme4_day0_keygen](minh_chung/crackme4_day0_keygen.png)
 
-  *Hình 4.4: Target xác nhận "You did it!!" khi nhập serial Day 0 `A10-57617274-686F67`.*
+  *Hình 4.3: Keygen sinh serial hằng `A10-57617274-686F67` cho Day 0 (Sunday).*
 
   ![crackme4_day0_success](minh_chung/crackme4_day0_success.png)
 
-  *Hình 4.5: Keygen sinh serial `<3<30` cho Day 1 (Monday) và tự tạo file phụ `xor0.rox` cần cho nhánh này.*
+  *Hình 4.4: Target xác nhận "You did it!!" khi nhập serial Day 0 `A10-57617274-686F67`.*
 
   ![crackme4_day1_keygen](minh_chung/crackme4_day1_keygen.png)
 
-  *Hình 4.6: Target xác nhận "You did it!!" khi nhập serial Day 1 `<3<30` và có file `xor0.rox` đi kèm.*
+  *Hình 4.5: Keygen sinh serial `<3<30` cho Day 1 (Monday) và tự tạo file phụ `xor0.rox` cần cho nhánh này.*
 
   ![crackme4_day1_success](minh_chung/crackme4_day1_success.png)
 
-  *Hình 4.7: Keygen sinh serial `T10-62E2` cho Day 2 (Tuesday), nhánh dùng CPUID.*
+  *Hình 4.6: Target xác nhận "You did it!!" khi nhập serial Day 1 `<3<30` và có file `xor0.rox` đi kèm.*
 
   ![crackme4_keygen](minh_chung/crackme4_keygen.png)
 
-  *Hình 4.8: Target xác nhận "You did it!!" với serial `T10-62E2` trong nhánh Tuesday.*
-  
-  ![crackme4_success](minh_chung/crackme4_success.png)
+  *Hình 4.7: Keygen sinh serial `T10-62E2` cho Day 2 (Tuesday), nhánh dùng CPUID.*
 
-  *Hình 4.9: Keygen sinh serial `E30A0AE3` cho Day 3 (Wednesday) với username `2412002924120070`.*
+  ![crackme4_success](minh_chung/crackme4_success.png)
+  
+  *Hình 4.8: Target xác nhận "You did it!!" với serial `T10-62E2` trong nhánh Tuesday.*
 
   ![crackme4_day3_keygen](minh_chung/crackme4_day3_keygen.png)
 
-  *Hình 4.10: Target xác nhận "You did it!!" khi nhập serial Day 3 `E30A0AE3`.*
+  *Hình 4.9: Keygen sinh serial `E30A0AE3` cho Day 3 (Wednesday) với username `2412002924120070`.*
 
   ![crackme4_day3_success](minh_chung/crackme4_day3_success.png)
 
-  *Hình 4.11: Keygen sinh serial MD5-reordered `D22318DA374B85A6BD460295A2D7EC41` cho Day 4 (Thursday).*
+  *Hình 4.10: Target xác nhận "You did it!!" khi nhập serial Day 3 `E30A0AE3`.*
 
   ![crackme4_day4_keygen](minh_chung/crackme4_day4_keygen.png)
 
-  *Hình 4.12: Target xác nhận "You did it!!" khi nhập serial Day 4 `D22318DA374B85A6BD460295A2D7EC41`.*
+  *Hình 4.11: Keygen sinh serial MD5-reordered `D22318DA374B85A6BD460295A2D7EC41` cho Day 4 (Thursday).*
 
   ![crackme4_day4_success](minh_chung/crackme4_day4_success.png)
 
-  *Hình 4.13: Keygen sinh serial checksum `1AC30325-0400-0400-1229-03E9` cho Day 5 (Friday).*
+  *Hình 4.12: Target xác nhận "You did it!!" khi nhập serial Day 4 `D22318DA374B85A6BD460295A2D7EC41`.*
 
   ![crackme4_day5_keygen](minh_chung/crackme4_day5_keygen.png)
 
-  *Hình 4.14: Target xác nhận "You did it!!" khi nhập serial Day 5 `1AC30325-0400-0400-1229-03E9`.*
+  *Hình 4.13: Keygen sinh serial checksum `1AC30325-0400-0400-1229-03E9` cho Day 5 (Friday).*
 
   ![crackme4_day5_success](minh_chung/crackme4_day5_success.png)
+
+  *Hình 4.14: Target xác nhận "You did it!!" khi nhập serial Day 5 `1AC30325-0400-0400-1229-03E9`.*
 
 ### Bước 4 — Viết Chương Trình Keygen Hoàn Chỉnh
 - **Ngôn ngữ:** Python
