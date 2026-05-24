@@ -418,12 +418,38 @@ Theo yêu cầu mục 6 của đồ án, nhóm đã điền đầy đủ các b�
 | Crackme 4 | 40 | 20 | 40 | 100 | 100% | Đã verify runtime đủ các nhánh Sunday-Friday; Saturday được nêu rõ là giới hạn kỹ thuật. |
 | **Trung bình** | | | | **100** | **100%** | |
 
-### 5.5 Phần Nhận Xét Tự Do
+### 5.5 Thang Đánh Giá Mức Độ Hoàn Thành
+| Mức | % hoàn thành | Mô tả đối chiếu |
+|---|:---:|---|
+| Xuất sắc | 90-100% | Hoàn thành đầy đủ, keygen chạy tốt, phân tích chi tiết rõ ràng, có ảnh minh chứng. |
+| Tốt | 75-89% | Hoàn thành phần lớn, keygen có thể còn một vài thiếu sót nhỏ hoặc bằng chứng chưa thật đầy đủ. |
+| Đạt | 50-74% | Có phân tích được thuật toán nhưng keygen chưa hoàn chỉnh hoặc còn lỗi khi chạy thực tế. |
+| Chưa đạt | 25-49% | Chỉ phân tích sơ bộ, chưa chứng minh được key hợp lệ hoặc chưa có keygen hoạt động. |
+| Không hoàn thành | 0-24% | Chưa phân tích được thuật toán và không có sản phẩm hoàn chỉnh. |
+
+**Nhận xét đối chiếu:** Với các minh chứng hiện có, Crackme1, Crackme2 và Crackme3 đạt mức Xuất sắc vì đã có đủ phân tích, keygen, ảnh disassembly và ảnh target xác nhận đúng serial. Crackme4 cũng có minh chứng runtime cho các nhánh Sunday-Friday; riêng Saturday được trình bày minh bạch là giới hạn kỹ thuật do thuật toán nằm sâu trong `helper.dll` và chưa được dựng lại thành keygen sạch, ổn định.
+
+### 5.6 Phần Nhận Xét Tự Do
 **Câu 1: Khó khăn lớn nhất gặp phải trong quá trình thực hiện là gì?**
-Khó khăn lớn nhất là việc phân tích thuật toán của Crackme 2 và Crackme 4. Ở Crackme 2, phần mềm cài cắm các bẫy Anti-Debugging sử dụng Structured Exception Handling (SEH) bằng lệnh `IN EAX, DX` gây lỗi liên tục, đồng thời sử dụng thuật toán nén phức tạp dạng SHA-1 với cơ chế Custom Mapping. Ở Crackme 4, luồng thực thi phụ thuộc vào ngày trong tuần (wDayOfWeek) của Windows và đọc cờ phần cứng CPUID, buộc phải giả lập nhiều môi trường ngày tháng và bóc tách từng nhánh độc lập.
+- Khó khăn lớn nhất là phân tích những crackme không dùng công thức tuyến tính đơn giản, đặc biệt là Crackme2 và Crackme4.
+- Với Crackme2, chương trình dùng cơ chế Anti-Debugging dựa trên SEH và lệnh `IN EAX, DX`, khiến debugger liên tục bị chuyển hướng luồng thực thi.
+- Ngoài anti-debug, phần sinh serial của Crackme2 còn giống vòng nén SHA-1 80 round rồi mới ánh xạ digest sang bảng ký tự riêng, nên phải đối chiếu cả assembly và kết quả chạy thật.
+- Với Crackme4, serial không cố định theo username mà phụ thuộc vào `wDayOfWeek` của Windows, làm cho một username có nhiều serial khác nhau theo từng ngày.
+- Nhóm phải đổi ngày hệ thống, kiểm tra lại từng nhánh Sunday-Friday, đồng thời phân tích thêm `helper.dll` để hiểu cơ chế dispatcher và nhánh Tuesday dùng `CPUID`.
+- Nhánh Saturday là phần khó nhất còn lại vì logic nằm sâu trong DLL và có dấu hiệu là một chuỗi băm tùy chỉnh dài, khó dựng thành keygen ổn định nếu chỉ dựa vào thử serial.
 
 **Câu 2: Kiến thức / kỹ năng nào được củng cố hoặc học thêm được qua đồ án này?**
-Qua đồ án, nhóm đã cải thiện đáng kể kỹ năng đọc hiểu mã máy x86 Assembly và thao tác với các công cụ dịch ngược như x64dbg, IDA Pro. Nhóm cũng học được cách thức hoạt động của các cơ chế bảo vệ phần mềm (Anti-debug), kỹ thuật hoán vị bảng (Crackme 3), cơ chế băm (Crackme 1, 2) và cách quy hoạch mã máy ngược về giả mã (Pseudocode) rồi lập trình mô phỏng lại logic bằng Python.
+- Nhóm củng cố kỹ năng đọc mã máy x86 Assembly, nhất là cách lần ngược từ API như `GetDlgItemTextA`, `GetComputerNameA`, `GetLocalTime` về đoạn xử lý serial.
+- Nhóm luyện cách đặt breakpoint, theo dõi thanh ghi, đọc vùng nhớ và nhận diện các điểm so sánh serial trong OllyDbg/x64dbg.
+- Về thuật toán, nhóm hiểu rõ hơn các kỹ thuật trộn dữ liệu bằng `XOR`, `ADD`, `ROL/ROR`, `BSWAP`, checksum, MD5/SHA-1-like hashing và ánh xạ ký tự tùy chỉnh.
+- Về anti-debug, nhóm học được cách crackme có thể dùng exception để làm rối luồng chạy và cách đi theo handler để tìm phần xử lý thật.
+- Về lập trình, nhóm rèn kỹ năng chuyển assembly sang pseudocode, sau đó hiện thực lại bằng Python thành keygen có CLI rõ ràng và có file `.exe` để chạy trực tiếp.
+- Về báo cáo kỹ thuật, nhóm học cách trình bày bằng chứng: địa chỉ/lệnh quan trọng, ảnh disassembly, ảnh keygen và ảnh target báo thành công cho cùng một username.
 
 **Câu 3: Nếu có thêm thời gian, nhóm sẽ cải thiện điểm nào?**
-Nếu có thêm thời gian, nhóm sẽ tiếp tục dựng lại trọn vẹn nhánh thuật toán Saturday của Crackme 4 vì nhánh này sử dụng mã băm tùy chỉnh phức tạp trong `helper.dll`. Bên cạnh đó, nhóm sẽ thiết kế thêm giao diện đồ họa (GUI) cho các keygen bằng PyQt hoặc Tkinter để tăng tính thân thiện thay vì chỉ hoạt động qua giao diện dòng lệnh (CLI).
+- Ưu tiên đầu tiên là tiếp tục phân tích trọn vẹn nhánh Saturday của Crackme4 để keygen bao phủ đủ cả 7 ngày trong tuần.
+- Nhóm sẽ đi sâu hơn vào `helper.dll`, đặt breakpoint tại các hàm con liên quan đến Day 6, ghi lại buffer trung gian và dựng lại pseudocode sạch thay vì dùng cách dò serial.
+- Sau khi hiểu được Day 6, nhóm sẽ bổ sung ảnh disassembly, ảnh keygen và ảnh target success tương tự các nhánh Sunday-Friday hiện tại.
+- Nhóm cũng muốn tự động hóa test cho Crackme4 bằng tham số `--day`, để khi đổi ngày hệ thống có thể sinh lại serial nhanh và tránh nhập nhầm.
+- Về sản phẩm, nhóm có thể thêm giao diện GUI đơn giản bằng Tkinter/PyQt để người dùng nhập username và chọn ngày kiểm thử dễ hơn.
+- Về báo cáo, nhóm sẽ bổ sung thêm phụ lục phân công công việc và nhật ký kiểm thử nếu giảng viên yêu cầu minh chứng quá trình làm việc chi tiết hơn.
