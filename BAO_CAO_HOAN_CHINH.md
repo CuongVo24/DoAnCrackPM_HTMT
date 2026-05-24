@@ -6,7 +6,7 @@
 - Võ Văn Cường - 24120029
 - Vương Hữu Khang - 24120070
 - Username minh họa chung: `2412002924120070`
-- Phạm vi minh chứng: 4 target gốc đều có ảnh keygen và ảnh target báo đúng key. Riêng Crackme4 phụ thuộc ngày trong tuần, báo cáo minh chứng runtime trên nhánh Tuesday và mô tả rõ các nhánh còn lại.
+- Phạm vi minh chứng: 4 target gốc đều có ảnh keygen và ảnh target báo đúng key. Riêng Crackme4 phụ thuộc ngày trong tuần, báo cáo minh chứng runtime trên các nhánh Tuesday, Wednesday, Thursday và mô tả rõ các nhánh còn lại.
 
 ---
 
@@ -275,8 +275,8 @@
   - **Day 0 - Sunday:** Nhánh này dùng serial hằng theo định dạng `A10-...`; keygen trả về `A10-57617274-686F67`.
   - **Day 1 - Monday:** Nhánh này tạo serial dạng `<3<3X`, trong đó ký tự cuối được tính từ byte thứ 4 của Username bằng phép XOR. Ngoài serial, target còn kiểm tra file phụ `xor0.rox`; vì vậy keygen tự tạo file `xor0.rox` 32 byte và đặt vào các vị trí thường dùng khi chạy test.
   - **Day 2 - Tuesday:** Đây là nhánh đã được test runtime và chụp minh chứng chính. Thuật toán dùng `CPUID` để lấy thông tin CPU, trộn với Username lặp 32 byte, sau đó tích lũy bằng hằng `0xB00B` để tạo serial dạng `T10-XXXX`.
-  - **Day 3 - Wednesday:** Nhánh này dùng bốn byte đầu của Username, kết hợp cộng, nhân, XOR và hoán đổi byte để tạo một giá trị HEX 32-bit.
-  - **Day 4 - Thursday:** Nhánh này băm Username bằng MD5, sau đó đảo vị trí hai nửa digest để tạo serial dạng HEX dài.
+  - **Day 3 - Wednesday:** Nhánh này đã được test runtime bổ sung. Thuật toán dùng bốn byte đầu của Username, kết hợp cộng, nhân, XOR và hoán đổi byte để tạo một giá trị HEX 32-bit.
+  - **Day 4 - Thursday:** Nhánh này đã được test runtime bổ sung. Thuật toán băm Username bằng MD5, sau đó đảo vị trí hai nửa digest để tạo serial dạng HEX dài.
   - **Day 5 - Friday:** Nhánh này dùng checksum kiểu Adler-32 rút gọn: cộng dồn từng byte Username, lấy module `0xFFF1`, rồi định dạng kết quả theo chuỗi có các phần cố định `-0400-0400-1229-03E9`.
 - **Giới hạn kỹ thuật của Day 6 - Saturday:** Nhánh Saturday nằm sâu trong `helper.dll`, không chỉ là vài phép toán số học trong file EXE chính. Qua phân tích, nhánh này dùng chuỗi xử lý băm tùy chỉnh lớn hơn, có dấu hiệu kết hợp nhiều hàm/hằng số trong DLL và không có đường suy luận ngắn để dựng lại keygen sạch. Nhóm có tham khảo hướng "serial fishing" bằng cách load DLL, patch memory và đọc buffer kết quả, nhưng cách đó phụ thuộc offset nội bộ của DLL, PowerShell/tiến trình 32-bit và có nguy cơ treo hoặc sai trên môi trường khác. Vì mục tiêu nộp bài là keygen ổn định, có thể giải thích và kiểm chứng được, nhóm không đưa nhánh Saturday vào bản keygen chính; thay vào đó báo cáo rõ phạm vi xử lý và minh chứng runtime trên nhánh Tuesday đã phân tích chắc chắn.
 - **Thuật toán sinh khóa (Pseudocode nhánh Tuesday):**
@@ -301,12 +301,34 @@
 
 ### Bước 3 — Đưa Ra Key Minh Họa
 - **Username chọn:** `2412002924120070`
-- **Day test:** `2` (Tuesday, ngày hệ thống khi test).
-- **Serial tính toán tương ứng:** `T10-62E2`
+- **Các nhánh đã test runtime trực tiếp:**
+
+  | Day | Ngày tương ứng | Serial sinh ra |
+  |---:|---|---|
+  | 2 | Tuesday | `T10-62E2` |
+  | 3 | Wednesday | `E30A0AE3` |
+  | 4 | Thursday | `D22318DA374B85A6BD460295A2D7EC41` |
+
 - **Ảnh minh chứng khi nhập vào crackme:**
-  *Hình 4.3: Target xác nhận "You did it!!" trong ngày thứ Ba.*
+  *Hình 4.3: Target xác nhận "You did it!!" với serial `T10-62E2` trong nhánh Tuesday.*
   
   ![crackme4_success](minh_chung/crackme4_success.png)
+
+  *Hình 4.4: Keygen sinh serial `E30A0AE3` cho Day 3 (Wednesday) với username `2412002924120070`.*
+
+  ![crackme4_day3_keygen](minh_chung/crackme4_day3_keygen.png)
+
+  *Hình 4.5: Target xác nhận "You did it!!" khi nhập serial Day 3 `E30A0AE3`.*
+
+  ![crackme4_day3_success](minh_chung/crackme4_day3_success.png)
+
+  *Hình 4.6: Keygen sinh serial MD5-reordered `D22318DA374B85A6BD460295A2D7EC41` cho Day 4 (Thursday).*
+
+  ![crackme4_day4_keygen](minh_chung/crackme4_day4_keygen.png)
+
+  *Hình 4.7: Target xác nhận "You did it!!" khi nhập serial Day 4 `D22318DA374B85A6BD460295A2D7EC41`.*
+
+  ![crackme4_day4_success](minh_chung/crackme4_day4_success.png)
 
 ### Bước 4 — Viết Chương Trình Keygen Hoàn Chỉnh
 - **Ngôn ngữ:** Python
@@ -319,9 +341,9 @@
   ```powershell
   .\24120029_24120070\Keygen\crackme4\keygen.exe 2412002924120070 --day 2
   ```
-  *(Ghi chú: Keygen hỗ trợ các nhánh Sunday, Monday, Tuesday, Wednesday, Thursday và Friday theo phân tích; minh chứng runtime trong báo cáo dùng nhánh Tuesday. Nhánh Saturday được nêu là giới hạn kỹ thuật vì thuật toán nằm trong `helper.dll` và chưa được dựng lại thành keygen sạch, ổn định).*
+  *(Ghi chú: Keygen hỗ trợ các nhánh Sunday, Monday, Tuesday, Wednesday, Thursday và Friday theo phân tích; minh chứng runtime trong báo cáo dùng các nhánh Tuesday, Wednesday và Thursday. Nhánh Saturday được nêu là giới hạn kỹ thuật vì thuật toán nằm trong `helper.dll` và chưa được dựng lại thành keygen sạch, ổn định).*
 - **Kết quả hiển thị từ Keygen:**
-  *Hình 4.4: Keygen tính Serial tương ứng cho Tuesday.*
+  *Hình 4.8: Keygen tính Serial tương ứng cho Tuesday.*
   
   ![crackme4_keygen](minh_chung/crackme4_keygen.png)
 
@@ -353,7 +375,7 @@ Theo yêu cầu mục 6 của đồ án, nhóm đã điền đầy đủ các b�
 | #  | Tiêu chí | Điểm tối đa | Tự chấm | Ghi chú |
 |----|---|:---:|:---:|---|
 | C1 | Keygen có giao diện nhập username rõ ràng | 5 | 5 | Chạy bằng tham số dòng lệnh CLI gọn gàng. |
-| C2 | Keygen sinh đúng key khớp với thuật toán gốc của crackme | 20 | 20 | Đã verify runtime cho 4 target; Crackme4 verify nhánh Tuesday và keygen hỗ trợ Sunday-Friday, riêng Saturday ghi rõ là giới hạn kỹ thuật. |
+| C2 | Keygen sinh đúng key khớp với thuật toán gốc của crackme | 20 | 20 | Đã verify runtime cho 4 target; Crackme4 verify các nhánh Tuesday, Wednesday, Thursday và keygen hỗ trợ Sunday-Friday, riêng Saturday ghi rõ là giới hạn kỹ thuật. |
 | C3 | Keygen chạy được thực tế, không lỗi runtime | 5 | 5 | Keygen (.exe) ổn định, xử lý được đầu vào và bắt lỗi. |
 | C4 | Source code có chú thích đầy đủ, dễ đọc, dễ hiểu | 5 | 5 | Code Python được chú thích đầy đủ trong src nộp. |
 | C5 | Có hướng dẫn sử dụng keygen trong báo cáo | 5 | 5 | Đã hướng dẫn chi tiết ở Bước 4 của từng bài. |
@@ -365,7 +387,7 @@ Theo yêu cầu mục 6 của đồ án, nhóm đã điền đầy đủ các b�
 | Crackme 1 | 40 | 20 | 40 | 100 | 100% | Đã verify runtime, có ảnh disassembly và ảnh success. |
 | Crackme 2 | 40 | 20 | 40 | 100 | 100% | Đã verify runtime, có phân tích anti-debug và custom mapping. |
 | Crackme 3 | 40 | 20 | 40 | 100 | 100% | Đã verify runtime, có ảnh bảng ký tự và vòng lặp sinh serial. |
-| Crackme 4 | 40 | 20 | 40 | 100 | 100% | Đã verify runtime nhánh Tuesday; hỗ trợ Sunday-Friday, Saturday được nêu rõ là giới hạn kỹ thuật. |
+| Crackme 4 | 40 | 20 | 40 | 100 | 100% | Đã verify runtime các nhánh Tuesday, Wednesday, Thursday; hỗ trợ Sunday-Friday, Saturday được nêu rõ là giới hạn kỹ thuật. |
 | **Trung bình** | | | | **100** | **100%** | |
 
 ### 5.5 Phần Nhận Xét Tự Do
