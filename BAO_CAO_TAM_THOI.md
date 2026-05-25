@@ -378,7 +378,7 @@ serial = "T10-" + hex16(value)
 .\24120029_24120070\Keygen\crackme4\keygen.exe 2412002924120070
 ```
 
-Hoặc chọn ngày cụ thể:
+Keygen mặc định dùng ngày hiện tại của Windows. Riêng nhánh Monday (`Day: 1`) yêu cầu thêm file `xor0.rox` cạnh `WhichKeyIsIt.exe`, keygen sẽ tự tạo file này nếu tìm thấy thư mục crackme4 gốc. Để tái tạo đúng minh chứng nhánh Tuesday trong báo cáo, chọn ngày cụ thể:
 
 ```powershell
 .\24120029_24120070\Keygen\crackme4\keygen.exe 2412002924120070 --day 2

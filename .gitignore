@@ -1,3 +1,6 @@
 .tmp/
 *.spec
 __pycache__/
+.xor0
+xor0.rox
+_MEI*/

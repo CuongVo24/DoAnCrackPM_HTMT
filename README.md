@@ -51,7 +51,8 @@ Xem thêm checklist test và hoàn thiện báo cáo tại [`HUONG_DAN_TEST_VA_H
 
 ### Lưu ý kiểm chứng
 - Crackme1 phụ thuộc `ComputerName`, vì vậy serial minh họa trong báo cáo khớp với máy `LAPTOPCUACUONG`.
-- Crackme4 phụ thuộc ngày trong tuần và CPUID. Keygen mặc định dùng nhánh Tuesday đã kiểm chứng để luôn sinh được serial minh họa; có thể dùng `--day` để chọn các nhánh đã implement: Sunday=0, Monday=1, Tuesday=2, Wednesday=3, Thursday=4, Friday=5. Nhánh Saturday=6 chưa implement.
+- Crackme4 phụ thuộc ngày trong tuần và CPUID. Keygen mặc định dùng ngày hiện tại của Windows; có thể dùng `--day` để chọn nhánh cụ thể khi cần tái tạo minh chứng: Sunday=0, Monday=1, Tuesday=2, Wednesday=3, Thursday=4, Friday=5. Nhánh Saturday=6 chưa implement.
+- Riêng nhánh Monday của crackme4 còn cần file `xor0.rox`; keygen sẽ tự tạo file này nếu tìm thấy thư mục crackme4 gốc trong repo. Khi test thủ công, đặt `xor0.rox` cạnh `WhichKeyIsIt.exe`.
 - Crackme2 chưa runtime-verify được trong workspace vì thiếu executable gốc, nhưng keygen và báo cáo đã giữ rõ phần rủi ro này.
 
 ### Cách 2: Chạy bằng file thực thi (EXE)

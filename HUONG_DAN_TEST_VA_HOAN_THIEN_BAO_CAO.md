@@ -102,7 +102,9 @@ Chi nen tu cham 100% khi co anh runtime success that cho ca 4 crackme. Neu crack
 
 ## 5. Cach lam crackme4 chac hon khi bao cao
 
-Keygen crackme4 hien mac dinh dung `Day: 2` de tao serial minh hoa `T10-62E2`. Cac nhanh da implement: Sunday `0`, Monday `1`, Tuesday `2`, Wednesday `3`, Thursday `4`, Friday `5`. Saturday `6` chua implement vi nhanh goc lon hon va dung custom hash phuc tap.
+Keygen crackme4 hien mac dinh dung ngay hien tai cua Windows. De tai tao serial minh hoa trong bao cao, chay them `--day 2` de ep nhanh Tuesday va tao serial `T10-62E2`. Cac nhanh da implement: Sunday `0`, Monday `1`, Tuesday `2`, Wednesday `3`, Thursday `4`, Friday `5`. Saturday `6` chua implement vi nhanh goc lon hon va dung custom hash phuc tap.
+
+Luu y rieng cho Monday `Day: 1`: target khong chi kiem tra serial ma con doc file `xor0.rox` dai 32 byte. Keygen se tu tao file nay neu tim thay thu muc crackme4 goc; khi test thu cong, can de `xor0.rox` cung thu muc voi `WhichKeyIsIt.exe`, neu khong target se khong bao dung key.
 
 Khi chup anh runtime success, nen lam trong moi truong kiem soat:
 

@@ -2,9 +2,16 @@ import argparse
 import ctypes
 import datetime as dt
 import hashlib
+import sys
+from pathlib import Path
 
 MASK32 = 0xFFFFFFFF
-DEFAULT_DAY = 2
+MONDAY_KEYFILE_NAME = "xor0.rox"
+MONDAY_KEYFILE = bytes.fromhex(
+    "DE C0 AD DE 02"
+    + " 09" * 22
+    + " 10 20 0A CE FA"
+)
 
 
 def bswap32(value: int) -> int:
@@ -93,6 +100,49 @@ def generate_monday_key(username: str) -> str:
     return "<3<3" + chr(last)
 
 
+def application_dir() -> Path:
+    if getattr(sys, "frozen", False):
+        return Path(sys.executable).resolve().parent
+    return Path(__file__).resolve().parent
+
+
+def monday_keyfile_targets() -> list[Path]:
+    roots = [Path.cwd(), application_dir()]
+    roots.extend(Path.cwd().parents)
+    roots.extend(application_dir().parents)
+
+    targets: list[Path] = []
+    targets.append(Path.cwd() / MONDAY_KEYFILE_NAME)
+    targets.append(application_dir() / MONDAY_KEYFILE_NAME)
+    for root in roots:
+        crackme4_dir = root / "Project crack phan mem" / "crackme" / "crack04"
+        if crackme4_dir.is_dir():
+            targets.append(crackme4_dir / MONDAY_KEYFILE_NAME)
+
+    unique_targets: list[Path] = []
+    seen: set[Path] = set()
+    for target in targets:
+        try:
+            resolved = target.resolve()
+        except OSError:
+            continue
+        if resolved not in seen:
+            seen.add(resolved)
+            unique_targets.append(resolved)
+    return unique_targets
+
+
+def write_monday_keyfiles() -> list[Path]:
+    written: list[Path] = []
+    for target in monday_keyfile_targets():
+        try:
+            target.write_bytes(MONDAY_KEYFILE)
+        except OSError:
+            continue
+        written.append(target)
+    return written
+
+
 def generate_wednesday_key(username: str) -> str:
     data = username.encode("ascii", errors="strict")
     if len(data) < 4:
@@ -135,7 +185,7 @@ def current_windows_day() -> int:
 
 
 def generate_key(username: str, day: int | None = None) -> str:
-    selected_day = DEFAULT_DAY if day is None else day
+    selected_day = current_windows_day() if day is None else day
     if selected_day == 0:
         return "A10-57617274-686F67"
     if selected_day == 1:
@@ -168,28 +218,42 @@ def main() -> None:
         "--day",
         type=int,
         choices=range(7),
-        default=DEFAULT_DAY,
-        help="Windows day of week: Sunday=0 ... Saturday=6. Default: 2 (verified Tuesday branch).",
+        default=None,
+        help="Windows day of week: Sunday=0 ... Saturday=6. Default: today's Windows day.",
     )
     parser.add_argument(
         "--current-day",
         action="store_true",
-        help="Use today's Windows day instead of the default verified Tuesday branch.",
+        help="Use today's Windows day. This is already the default and is kept for compatibility.",
     )
     args = parser.parse_args()
 
     interactive = args.username is None
     username = args.username or input("Username: ").strip()
-    day = current_windows_day() if args.current_day else args.day
+    day = None if args.current_day else args.day
     try:
-        serial = generate_key(username, day)
+        selected_day = current_windows_day() if day is None else day
+        serial = generate_key(username, selected_day)
     except (RuntimeError, ValueError) as exc:
         print(f"Error: {exc}")
         pause_if_interactive(interactive)
         raise SystemExit(1)
     print(f"Username: {username}")
-    print(f"Day: {day}")
+    print(f"Day: {selected_day}")
     print(f"Serial: {serial}")
+    if selected_day == 1:
+        written_keyfiles = write_monday_keyfiles()
+        if written_keyfiles:
+            print(f"KeyFile: {MONDAY_KEYFILE_NAME} was written for the Monday branch.")
+            for path in written_keyfiles:
+                try:
+                    display_path = path.relative_to(Path.cwd().resolve())
+                except ValueError:
+                    display_path = path
+                safe_path = str(display_path).encode("ascii", errors="backslashreplace").decode("ascii")
+                print(f"KeyFilePath: {safe_path}")
+        else:
+            print(f"KeyFile: Monday branch requires {MONDAY_KEYFILE_NAME} beside WhichKeyIsIt.exe.")
     pause_if_interactive(interactive)
 
 
