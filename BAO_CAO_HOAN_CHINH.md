@@ -254,6 +254,15 @@
   - Vùng dispatcher chính nằm trong `helper.dll` tại `0x10005189`: hàm gọi `GetLocalTime`, đọc byte `wDayOfWeek` tại `[0x1000E365 + 4]`, sau đó so sánh lần lượt với `0..6` để chọn nhánh xử lý.
   - Nhánh Tuesday được gọi từ `0x100051C9` sang hàm `0x100010D9`. Trong hàm này có hai lệnh `CPUID` tại `0x1000110B` và `0x10001119`, sau đó vòng lặp tích lũy bắt đầu quanh `0x10001143` với hằng `0xB00B`.
 
+  **Ảnh minh chứng quá trình phân tích:**
+  *Hình 4.1: Dispatcher của Crackme4 trong `helper.dll` tại `0x10005189`. Hàm gọi `GetLocalTime`, lấy cấu trúc thời gian vào vùng `0x1000E365`, đọc `wDayOfWeek` tại `[EDI+4]`, rồi so sánh `AL` lần lượt với `0..6` để rẽ sang thuật toán tương ứng từng ngày.*
+
+  ![crackme4_disasm_day_dispatcher](minh_chung/crackme4_disasm_day_dispatcher.png)
+
+  *Hình 4.2: Nhánh Tuesday trong `helper.dll`. Đoạn code sử dụng hai lệnh `CPUID` tại `0x1000110B` và `0x10001119`, kết hợp `BSWAP`, `XOR` để tạo giá trị trộn theo CPU; sau đó vòng lặp tại `0x10001143` dùng hằng `0xB00B` để tích lũy và kiểm tra serial dạng `T10-XXXX`.*
+
+  ![crackme4_disasm_tuesday_cpuid](minh_chung/crackme4_disasm_tuesday_cpuid.png)
+
 ### Bước 2 — Giải Thích Ý Nghĩa Thuật Toán
 - **Cơ chế rẽ nhánh theo ngày:** Crackme4 lấy `wDayOfWeek` của Windows rồi chọn thuật toán tương ứng. Quy ước của Windows là `Sunday=0`, `Monday=1`, `Tuesday=2`, `Wednesday=3`, `Thursday=4`, `Friday=5`, `Saturday=6`. Vì vậy cùng một Username có thể cần Serial khác nhau nếu chạy target vào ngày khác.
 - **Giải thích (nhánh Tuesday):** 
@@ -294,7 +303,7 @@
 - **Day test:** `2` (Tuesday, ngày hệ thống khi test).
 - **Serial tính toán tương ứng:** `T10-62E2`
 - **Ảnh minh chứng khi nhập vào crackme:**
-  *Hình 4.1: Target xác nhận "You did it!!" trong ngày thứ Ba.*
+  *Hình 4.3: Target xác nhận "You did it!!" trong ngày thứ Ba.*
   
   ![crackme4_success](minh_chung/crackme4_success.png)
 
@@ -311,7 +320,7 @@
   ```
   *(Ghi chú: Keygen hỗ trợ các nhánh Sunday, Monday, Tuesday, Wednesday, Thursday và Friday. Nhánh Saturday được nêu là hạn chế kỹ thuật vì thuật toán nằm trong `helper.dll` và chưa được dựng lại thành keygen sạch, ổn định).*
 - **Kết quả hiển thị từ Keygen:**
-  *Hình 4.2: Keygen tính Serial tương ứng cho Tuesday.*
+  *Hình 4.4: Keygen tính Serial tương ứng cho Tuesday.*
   
   ![crackme4_keygen](minh_chung/crackme4_keygen.png)
 
@@ -328,7 +337,7 @@ Theo yêu cầu mục 6 của đồ án, nhóm đã điền đầy đủ các b�
 | A2 | Tìm được đúng hàm / đoạn mã kiểm tra key | 10 | 10 | Đã tìm và ghi rõ địa chỉ các đoạn check/sinh key. |
 | A3 | Trình bày đoạn mã assembly / pseudocode rõ ràng, có chú thích | 10 | 10 | Có ASM chi tiết và Pseudocode cho mỗi bài ở Bước 1 & 2. |
 | A4 | Giải thích đúng ý nghĩa từng bước của thuật toán | 10 | 10 | Giải thích rõ logic đầu vào, đầu ra, anti-debug. |
-| A5 | Có ảnh chụp màn hình minh họa quá trình phân tích | 5 | 5 | Đã chèn đầy đủ ảnh Disassembly (Crackme 1, 2, 3). |
+| A5 | Có ảnh chụp màn hình minh họa quá trình phân tích | 5 | 5 | Đã chèn đầy đủ ảnh Disassembly cho Crackme 1, 2, 3 và Crackme4. |
 | **Tổng phần A** | | **40** | **40** | Đạt 100% |
 
 ### 5.2 Phần B — Tìm Key Minh Họa (20 điểm)
