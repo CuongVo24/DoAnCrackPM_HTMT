@@ -83,6 +83,10 @@ Hình 6. Crackme3 xác nhận serial đúng (`Serial is OK`).
 
 ![crackme3_success](minh_chung/crackme3_success.png)
 
+Hình bổ sung C3-A. Crackme3 trong OllyDbg tại vùng `0x401076..0x4010E7`: chương trình đọc Username và Serial thông qua hàm `GetDlgItemTextA`, sau đó gọi hàm tính toán chính tại `0x4010BE`. Bên trong hàm này (tại mốc `0x4010CA`), chương trình nạp địa chỉ bảng ký tự (alphabet) `0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ` vào stack. Tiếp đó, nó dùng `lstrlenA` để đếm độ dài Username, nếu bằng 0 sẽ hiện thông báo lỗi "no name entered".
+
+![crackme3_disasm_table](minh_chung/crackme3_disasm_table.png)
+
 ### Crackme4
 
 Hình 7. Keygen crackme4 chạy với username `2412002924120070`.
@@ -97,7 +101,7 @@ Hình 8. Crackme4 xác nhận serial đúng (`You did it!!`).
 
 - Crackme1 đã bổ sung ảnh disassembly tại vùng sinh serial `0x4011A2..0x401203` và vùng so sánh `0x40127C..0x40128F`.
 - Crackme2 đã có đủ bộ ảnh disassembly (Anti-Debug, vòng lặp SHA-1 và ánh xạ Custom Hash). Hoàn thiện 100%.
-- Ảnh disassembly/debug cho crackme3 tại đoạn xử lý bảng ký tự.
+- Crackme3 đã có ảnh khởi tạo bảng ký tự. Còn thiếu ảnh đoạn vòng lặp biến đổi ký tự (phía dưới đoạn kiểm tra `lstrlenA`).
 - Ảnh disassembly/debug cho crackme4 tại đoạn lấy ngày trong tuần/nhánh Tuesday.
 
 ## 3. Crackme1 - KeygenMe1.exe
