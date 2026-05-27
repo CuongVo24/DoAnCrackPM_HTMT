@@ -91,6 +91,10 @@ Hình bổ sung C3-B. Crackme3 trong OllyDbg tại vùng `0x4010FD..0x401136`: t
 
 ![crackme3_disasm_serial_check](minh_chung/crackme3_disasm_serial_check.png)
 
+Hình bổ sung C3-C. Crackme3 trong OllyDbg tại vùng `0x4011DC..0x40121B`: đây là nơi chứa thuật toán cốt lõi. Nửa trên (từ `0x4011DC` đến `0x4011F5`) là vòng lặp đọc từng ký tự Username (`LODS`), thực hiện `XOR` với ký tự kế tiếp, cộng dồn vào `DL`, rồi tra bảng ký tự (`MOV AL, BYTE PTR DS:[EDX+EAX]`). Nửa dưới (từ `0x4011FF`) là đoạn mã tính độ dời (offset) xoay bảng bằng cách lấy độ dài chuỗi nhân 4 (`SHL EAX, 2`), giới hạn trần là `0x3C` (`CMP EAX, 3C`).
+
+![crackme3_disasm_loop](minh_chung/crackme3_disasm_loop.png)
+
 ### Crackme4
 
 Hình 7. Keygen crackme4 chạy với username `2412002924120070`.
@@ -105,7 +109,7 @@ Hình 8. Crackme4 xác nhận serial đúng (`You did it!!`).
 
 - Crackme1 đã bổ sung ảnh disassembly tại vùng sinh serial `0x4011A2..0x401203` và vùng so sánh `0x40127C..0x40128F`.
 - Crackme2 đã có đủ bộ ảnh disassembly (Anti-Debug, vòng lặp SHA-1 và ánh xạ Custom Hash). Hoàn thiện 100%.
-- Crackme3 đã có ảnh khởi tạo bảng ký tự và kiểm tra đầu vào. Còn thiếu ảnh đoạn thuật toán xử lý biến đổi ký tự bên trong hàm `0x4011FF`.
+- Crackme3 đã hoàn thiện đầy đủ ảnh minh chứng cho thuật toán (vòng lặp biến đổi ký tự và xoay bảng). Hoàn thiện 100%.
 - Ảnh disassembly/debug cho crackme4 tại đoạn lấy ngày trong tuần/nhánh Tuesday.
 
 ## 3. Crackme1 - KeygenMe1.exe
