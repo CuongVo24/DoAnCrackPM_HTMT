@@ -41,6 +41,14 @@ Hình 2. Crackme1 xác nhận serial đúng (`Serial is correct!`).
 
 ![crackme1_success](minh_chung/crackme1_success.png)
 
+Hình bổ sung C1-A. Crackme1 trong OllyDbg tại vùng `0x4011A2..0x401203`: chương trình đọc `Name` bằng `GetDlgItemTextA`, lấy `machine_hash` từ `0x4042C4`, sau đó dùng các lệnh `AND`, `XOR`, `ADD` để trộn username với giá trị phụ thuộc `ComputerName`.
+
+![crackme1_disasm_generate](minh_chung/crackme1_disasm_generate.png)
+
+Hình bổ sung C1-B. Crackme1 trong OllyDbg tại vùng `0x40127C..0x40128F`: vòng lặp lấy từng byte serial đã sinh ở `0x4042CB`, so sánh với serial người dùng nhập ở `0x404293` bằng `CMP AL, DL`; nếu khác thì nhảy sang nhánh báo sai key.
+
+![crackme1_disasm_compare](minh_chung/crackme1_disasm_compare.png)
+
 ### Crackme2
 
 Hình 3. Keygen crackme2 chạy với username `2412002924120070`.
@@ -73,7 +81,7 @@ Hình 8. Crackme4 xác nhận serial đúng (`You did it!!`).
 
 ### Ảnh còn thiếu nếu muốn báo cáo đẹp hơn
 
-- Ảnh disassembly/debug cho crackme1 tại đoạn `0x4011A2..0x401296` hoặc đoạn hash máy `0x40132D..0x40136F`.
+- Crackme1 đã bổ sung ảnh disassembly tại vùng sinh serial `0x4011A2..0x401203` và vùng so sánh `0x40127C..0x40128F`.
 - Ảnh disassembly/debug cho crackme2 tại đoạn SHA-1/custom hash và đoạn so khớp 20 ký tự serial.
 - Ảnh disassembly/debug cho crackme3 tại đoạn xử lý bảng ký tự.
 - Ảnh disassembly/debug cho crackme4 tại đoạn lấy ngày trong tuần/nhánh Tuesday.
@@ -105,6 +113,8 @@ Serial sinh ra:
 
 - `minh_chung/crackme1_keygen.png`: keygen sinh serial.
 - `minh_chung/crackme1_success.png`: target báo `Serial is correct!`.
+- `minh_chung/crackme1_disasm_generate.png`: OllyDbg tại vùng đọc username và sinh serial.
+- `minh_chung/crackme1_disasm_compare.png`: OllyDbg tại vùng so sánh serial sinh ra với serial người dùng nhập.
 
 ### 3.3. Phân tích thuật toán
 
@@ -135,6 +145,11 @@ Các đoạn assembly quan trọng:
 
 40127c..40128f                ; so sánh serial người dùng nhập với serial sinh ra
 ```
+
+Hai ảnh disassembly đã chụp thể hiện rõ hai phần quan trọng:
+
+- Vùng `0x4011A2..0x401203`: đọc username, lấy machine hash tại `0x4042C4`, rồi trộn dữ liệu bằng `AND`, `XOR`, `ADD`.
+- Vùng `0x40127C..0x40128F`: lấy serial sinh ra từ `0x4042CB`, lấy serial nhập từ `0x404293`, dùng `CMP AL, DL` để so từng byte và nhảy sang nhánh lỗi nếu có byte khác.
 
 Pseudocode rút gọn:
 
