@@ -59,6 +59,20 @@ Hình 4. Crackme2 xác nhận serial đúng (`Good Boy! Nice shoot!`).
 
 ![crackme2_success](minh_chung/crackme2_success.png)
 
+Hình bổ sung C2-A. Crackme2 trong OllyDbg tại vùng `0x401789..0x40180E`: chương trình thiết lập cơ chế bẫy lỗi (SEH - Structured Exception Handling) bằng cách đẩy địa chỉ hàm xử lý ngoại lệ `0x4022FD` vào stack, sau đó cố tình gọi lệnh đặc quyền `IN EAX, DX` để tạo exception. Đây là một kỹ thuật Anti-Debugging nhằm làm thay đổi luồng thực thi và cản trở việc phân tích mã (Anti-debug/Obfuscation).
+
+![crackme2_disasm_antidebug](minh_chung/crackme2_disasm_antidebug.png)
+
+Hình bổ sung C2-B. Crackme2 trong OllyDbg tại vùng `0x401ACA..0x401BB9`: logic ánh xạ 20 ký tự serial (Custom Hash). Chương trình thiết lập vòng lặp 20 lần (`MOV ECX, 14` ở `0x401ACA`), kiểm tra giá trị từng byte (`CMP BL, 9` ở `0x401B64`). Nếu byte <= 9 thì cộng thêm `0x30` để đổi thành ký tự '0'..'9' (`MOV ESI, 30` ở `0x401B83`), nếu lớn hơn thì cộng thêm `0x40` để thành ký tự 'J'..'O' (`MOV ESI, 40` ở `0x401BB9`). Xen kẽ giữa các lệnh là các bẫy ngoại lệ (`IN EAX, DX`) để chống debug.
+
+![crackme2_disasm_custom_mapping_1](minh_chung/crackme2_disasm_custom_mapping_1.png)
+
+![crackme2_disasm_custom_mapping_2](minh_chung/crackme2_disasm_custom_mapping_2.png)
+
+Hình bổ sung C2-C. Crackme2 trong OllyDbg tại vùng `0x401956..0x401993`: phần cuối của vòng lặp xử lý 80 vòng nén (tương đương 80 round của thuật toán SHA-1). Tại đây có lệnh `INC ECX` và `CMP ECX, 50` (0x50 = 80) để đếm số vòng lặp, sau đó dùng lệnh nhảy `JNZ` và `JMP` quay lại đầu vòng lặp ở mốc `0x401789`. Các lệnh `MOV` và `ROR EAX, 2` bên trên là các bước cập nhật và dịch xoay các biến trạng thái (hệ số A, B, C, D, E) đặc trưng của thuật toán băm.
+
+![crackme2_disasm_sha1_loop](minh_chung/crackme2_disasm_sha1_loop.png)
+
 ### Crackme3
 
 Hình 5. Keygen crackme3 chạy với username `2412002924120070`.
@@ -82,7 +96,7 @@ Hình 8. Crackme4 xác nhận serial đúng (`You did it!!`).
 ### Ảnh còn thiếu nếu muốn báo cáo đẹp hơn
 
 - Crackme1 đã bổ sung ảnh disassembly tại vùng sinh serial `0x4011A2..0x401203` và vùng so sánh `0x40127C..0x40128F`.
-- Ảnh disassembly/debug cho crackme2 tại đoạn SHA-1/custom hash và đoạn so khớp 20 ký tự serial.
+- Crackme2 đã có đủ bộ ảnh disassembly (Anti-Debug, vòng lặp SHA-1 và ánh xạ Custom Hash). Hoàn thiện 100%.
 - Ảnh disassembly/debug cho crackme3 tại đoạn xử lý bảng ký tự.
 - Ảnh disassembly/debug cho crackme4 tại đoạn lấy ngày trong tuần/nhánh Tuesday.
 
