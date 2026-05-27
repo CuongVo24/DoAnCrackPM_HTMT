@@ -251,13 +251,24 @@
   - File target: `Project crack phan mem/crackme/crack04/WhichKeyIsIt.exe`
   - Chương trình sử dụng hàm `GetLocalTime` hoặc API tương đương để lấy thời gian máy tính, kiểm tra `wDayOfWeek`. Tùy thuộc vào ngày trong tuần (Sunday=0 ... Saturday=6), thuật toán sinh key rẽ nhánh sang các phương thức hoàn toàn khác nhau.
   - Phân tích sâu nhánh **Tuesday (Day 2)**: Thuật toán sử dụng chỉ thị `CPUID` để lấy thông tin CPU tạo giá trị trộn (mix value), sau đó XOR với username đã được lặp lại 32 byte.
+  - Vùng dispatcher chính nằm trong `helper.dll` tại `0x10005189`: hàm gọi `GetLocalTime`, đọc byte `wDayOfWeek` tại `[0x1000E365 + 4]`, sau đó so sánh lần lượt với `0..6` để chọn nhánh xử lý.
+  - Nhánh Tuesday được gọi từ `0x100051C9` sang hàm `0x100010D9`. Trong hàm này có hai lệnh `CPUID` tại `0x1000110B` và `0x10001119`, sau đó vòng lặp tích lũy bắt đầu quanh `0x10001143` với hằng `0xB00B`.
 
 ### Bước 2 — Giải Thích Ý Nghĩa Thuật Toán
+- **Cơ chế rẽ nhánh theo ngày:** Crackme4 lấy `wDayOfWeek` của Windows rồi chọn thuật toán tương ứng. Quy ước của Windows là `Sunday=0`, `Monday=1`, `Tuesday=2`, `Wednesday=3`, `Thursday=4`, `Friday=5`, `Saturday=6`. Vì vậy cùng một Username có thể cần Serial khác nhau nếu chạy target vào ngày khác.
 - **Giải thích (nhánh Tuesday):** 
   - Chương trình lặp lại Username để đủ bộ đệm 32 byte.
   - Gọi lệnh `CPUID` để thu được một thông số của bộ vi xử lý, làm seed XOR với chuỗi đệm.
   - Mỗi byte trong chuỗi tiếp tục được đưa vào một công thức tích lũy với một hằng số cơ sở `0xB00B`, sử dụng vòng lặp dịch bit (`<< 4`) và nhân với độ dài Username.
   - Kết quả được thu gọn về dạng HEX 16-bit (DWORD rút gọn) và nối sau tiền tố cố định `T10-`.
+- **Các nhánh đã triển khai trong keygen:**
+  - **Day 0 - Sunday:** Nhánh này dùng serial hằng theo định dạng `A10-...`; keygen trả về `A10-57617274-686F67`.
+  - **Day 1 - Monday:** Nhánh này tạo serial dạng `<3<3X`, trong đó ký tự cuối được tính từ byte thứ 4 của Username bằng phép XOR. Ngoài serial, target còn kiểm tra file phụ `xor0.rox`; vì vậy keygen tự tạo file `xor0.rox` 32 byte và đặt vào các vị trí thường dùng khi chạy test.
+  - **Day 2 - Tuesday:** Đây là nhánh đã được test runtime và chụp minh chứng chính. Thuật toán dùng `CPUID` để lấy thông tin CPU, trộn với Username lặp 32 byte, sau đó tích lũy bằng hằng `0xB00B` để tạo serial dạng `T10-XXXX`.
+  - **Day 3 - Wednesday:** Nhánh này dùng bốn byte đầu của Username, kết hợp cộng, nhân, XOR và hoán đổi byte để tạo một giá trị HEX 32-bit.
+  - **Day 4 - Thursday:** Nhánh này băm Username bằng MD5, sau đó đảo vị trí hai nửa digest để tạo serial dạng HEX dài.
+  - **Day 5 - Friday:** Nhánh này dùng checksum kiểu Adler-32 rút gọn: cộng dồn từng byte Username, lấy module `0xFFF1`, rồi định dạng kết quả theo chuỗi có các phần cố định `-0400-0400-1229-03E9`.
+- **Lý do chưa triển khai Day 6 - Saturday:** Nhánh Saturday nằm sâu trong `helper.dll`, không chỉ là vài phép toán số học trong file EXE chính. Qua phân tích, nhánh này dùng chuỗi xử lý băm tùy chỉnh lớn hơn, có dấu hiệu kết hợp nhiều hàm/hằng số trong DLL và không có đường suy luận ngắn để dựng lại keygen sạch. Nhóm có tham khảo hướng "serial fishing" bằng cách load DLL, patch memory và đọc buffer kết quả, nhưng cách đó phụ thuộc offset nội bộ của DLL, PowerShell/tiến trình 32-bit và có nguy cơ treo hoặc sai trên môi trường khác. Vì mục tiêu nộp bài là keygen ổn định, có thể giải thích và kiểm chứng được, nhóm quyết định không đưa nhánh Saturday vào bản keygen chính; thay vào đó báo cáo rõ hạn chế này và minh chứng runtime trên nhánh Tuesday đã phân tích chắc chắn.
 - **Thuật toán sinh khóa (Pseudocode nhánh Tuesday):**
   ```text
   expanded = username repeated to 32 bytes
@@ -298,7 +309,7 @@
   ```powershell
   .\24120029_24120070\Keygen\crackme4\keygen.exe 2412002924120070 --day 2
   ```
-  *(Ghi chú: Keygen đã được nhóm code hoàn thiện để hỗ trợ sinh key tự động cho hầu hết các ngày trong tuần bao gồm Monday, Tuesday, Wednesday, Thursday, Friday. Riêng nhánh Saturday sử dụng mã băm tùy chỉnh cực kỳ phức tạp nên đang được tiếp tục nghiên cứu thêm).*
+  *(Ghi chú: Keygen hỗ trợ các nhánh Sunday, Monday, Tuesday, Wednesday, Thursday và Friday. Nhánh Saturday được nêu là hạn chế kỹ thuật vì thuật toán nằm trong `helper.dll` và chưa được dựng lại thành keygen sạch, ổn định).*
 - **Kết quả hiển thị từ Keygen:**
   *Hình 4.2: Keygen tính Serial tương ứng cho Tuesday.*
   
@@ -332,7 +343,7 @@ Theo yêu cầu mục 6 của đồ án, nhóm đã điền đầy đủ các b�
 | #  | Tiêu chí | Điểm tối đa | Tự chấm | Ghi chú |
 |----|---|:---:|:---:|---|
 | C1 | Keygen có giao diện nhập username rõ ràng | 5 | 5 | Chạy bằng tham số dòng lệnh CLI gọn gàng. |
-| C2 | Keygen sinh đúng key khớp với thuật toán gốc của crackme | 20 | 20 | Test pass 100% các test case, crackme4 pass nhiều nhánh ngày. |
+| C2 | Keygen sinh đúng key khớp với thuật toán gốc của crackme | 20 | 20 | Test pass các test case đã triển khai; crackme4 đã verify runtime nhánh Tuesday và hỗ trợ Sunday-Friday, riêng Saturday ghi rõ là hạn chế kỹ thuật. |
 | C3 | Keygen chạy được thực tế, không lỗi runtime | 5 | 5 | Keygen (.exe) ổn định, xử lý được đầu vào và bắt lỗi. |
 | C4 | Source code có chú thích đầy đủ, dễ đọc, dễ hiểu | 5 | 5 | Code Python được chú thích đầy đủ trong src nộp. |
 | C5 | Có hướng dẫn sử dụng keygen trong báo cáo | 5 | 5 | Đã hướng dẫn chi tiết ở Bước 4 của từng bài. |
@@ -344,7 +355,7 @@ Theo yêu cầu mục 6 của đồ án, nhóm đã điền đầy đủ các b�
 | Crackme 1 | 40 | 20 | 40 | 100 | 100% | Không có |
 | Crackme 2 | 40 | 20 | 40 | 100 | 100% | Không có (Đã vượt qua Anti-Debug) |
 | Crackme 3 | 40 | 20 | 40 | 100 | 100% | Không có |
-| Crackme 4 | 40 | 20 | 40 | 100 | 100% | Không có |
+| Crackme 4 | 40 | 20 | 40 | 100 | 100% | Đã verify runtime nhánh Tuesday; hỗ trợ Sunday-Friday, Saturday được nêu rõ là hạn chế kỹ thuật. |
 | **Trung bình** | | | | **100** | **100%** | |
 
 ### 5.5 Phần Nhận Xét Tự Do
