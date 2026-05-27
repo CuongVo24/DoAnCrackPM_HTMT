@@ -87,6 +87,10 @@ Hình bổ sung C3-A. Crackme3 trong OllyDbg tại vùng `0x401076..0x4010E7`: c
 
 ![crackme3_disasm_table](minh_chung/crackme3_disasm_table.png)
 
+Hình bổ sung C3-B. Crackme3 trong OllyDbg tại vùng `0x4010FD..0x401136`: tiếp tục luồng kiểm tra, chương trình dùng `lstrlenA` để đếm độ dài Serial nhập vào. Nếu bỏ trống sẽ hiện thông báo "no serial entered". Nếu hợp lệ, nó nạp Username và độ dài vào stack rồi gọi hàm `0x4011FF` - đây mới chính là nơi chứa thuật toán sinh key thực sự.
+
+![crackme3_disasm_serial_check](minh_chung/crackme3_disasm_serial_check.png)
+
 ### Crackme4
 
 Hình 7. Keygen crackme4 chạy với username `2412002924120070`.
@@ -101,7 +105,7 @@ Hình 8. Crackme4 xác nhận serial đúng (`You did it!!`).
 
 - Crackme1 đã bổ sung ảnh disassembly tại vùng sinh serial `0x4011A2..0x401203` và vùng so sánh `0x40127C..0x40128F`.
 - Crackme2 đã có đủ bộ ảnh disassembly (Anti-Debug, vòng lặp SHA-1 và ánh xạ Custom Hash). Hoàn thiện 100%.
-- Crackme3 đã có ảnh khởi tạo bảng ký tự. Còn thiếu ảnh đoạn vòng lặp biến đổi ký tự (phía dưới đoạn kiểm tra `lstrlenA`).
+- Crackme3 đã có ảnh khởi tạo bảng ký tự và kiểm tra đầu vào. Còn thiếu ảnh đoạn thuật toán xử lý biến đổi ký tự bên trong hàm `0x4011FF`.
 - Ảnh disassembly/debug cho crackme4 tại đoạn lấy ngày trong tuần/nhánh Tuesday.
 
 ## 3. Crackme1 - KeygenMe1.exe
