@@ -3,9 +3,10 @@
 **Môn học:** Hệ Thống Máy Tính
 **Hình thức:** Nhóm tối đa 2 sinh viên
 **Nhóm sinh viên thực hiện:**
-- MSSV1: 24120029
-- MSSV2: 24120070
+- Võ Văn Cường - 24120029
+- Vương Hữu Khang - 24120070
 - Username minh họa chung: `2412002924120070`
+- Phạm vi minh chứng: 4 target gốc đều có ảnh keygen và ảnh target báo đúng key. Riêng Crackme4 phụ thuộc ngày trong tuần, báo cáo minh chứng runtime trên nhánh Tuesday và mô tả rõ các nhánh còn lại.
 
 ---
 
@@ -18,7 +19,7 @@
   - Bằng cách đặt breakpoint tại hàm API `GetDlgItemTextA`, nhóm xác định được chương trình đọc Username người dùng nhập vào. Sau đó, nó gọi hàm `GetComputerNameA` để lấy tên máy tính (ComputerName) và tính toán ra một mã băm (Machine Hash).
   - Vùng sinh key chính nằm tại `0x4011A2` đến `0x401203`. Tại đây, chương trình sử dụng các phép toán `AND`, `XOR`, `ADD` để trộn các byte của Username với `Machine Hash`.
   
-  **Đoạn Assembly quan trọng yếu:**
+  **Đoạn Assembly quan trọng:**
   ```asm
   401156: call 0x40132d          ; tính machine hash từ GetComputerNameA
   40115b: mov  %eax,0x4042c4     ; lưu machine hash (Computer ID)
@@ -277,7 +278,7 @@
   - **Day 3 - Wednesday:** Nhánh này dùng bốn byte đầu của Username, kết hợp cộng, nhân, XOR và hoán đổi byte để tạo một giá trị HEX 32-bit.
   - **Day 4 - Thursday:** Nhánh này băm Username bằng MD5, sau đó đảo vị trí hai nửa digest để tạo serial dạng HEX dài.
   - **Day 5 - Friday:** Nhánh này dùng checksum kiểu Adler-32 rút gọn: cộng dồn từng byte Username, lấy module `0xFFF1`, rồi định dạng kết quả theo chuỗi có các phần cố định `-0400-0400-1229-03E9`.
-- **Lý do chưa triển khai Day 6 - Saturday:** Nhánh Saturday nằm sâu trong `helper.dll`, không chỉ là vài phép toán số học trong file EXE chính. Qua phân tích, nhánh này dùng chuỗi xử lý băm tùy chỉnh lớn hơn, có dấu hiệu kết hợp nhiều hàm/hằng số trong DLL và không có đường suy luận ngắn để dựng lại keygen sạch. Nhóm có tham khảo hướng "serial fishing" bằng cách load DLL, patch memory và đọc buffer kết quả, nhưng cách đó phụ thuộc offset nội bộ của DLL, PowerShell/tiến trình 32-bit và có nguy cơ treo hoặc sai trên môi trường khác. Vì mục tiêu nộp bài là keygen ổn định, có thể giải thích và kiểm chứng được, nhóm quyết định không đưa nhánh Saturday vào bản keygen chính; thay vào đó báo cáo rõ hạn chế này và minh chứng runtime trên nhánh Tuesday đã phân tích chắc chắn.
+- **Giới hạn kỹ thuật của Day 6 - Saturday:** Nhánh Saturday nằm sâu trong `helper.dll`, không chỉ là vài phép toán số học trong file EXE chính. Qua phân tích, nhánh này dùng chuỗi xử lý băm tùy chỉnh lớn hơn, có dấu hiệu kết hợp nhiều hàm/hằng số trong DLL và không có đường suy luận ngắn để dựng lại keygen sạch. Nhóm có tham khảo hướng "serial fishing" bằng cách load DLL, patch memory và đọc buffer kết quả, nhưng cách đó phụ thuộc offset nội bộ của DLL, PowerShell/tiến trình 32-bit và có nguy cơ treo hoặc sai trên môi trường khác. Vì mục tiêu nộp bài là keygen ổn định, có thể giải thích và kiểm chứng được, nhóm không đưa nhánh Saturday vào bản keygen chính; thay vào đó báo cáo rõ phạm vi xử lý và minh chứng runtime trên nhánh Tuesday đã phân tích chắc chắn.
 - **Thuật toán sinh khóa (Pseudocode nhánh Tuesday):**
   ```text
   expanded = username repeated to 32 bytes
@@ -318,7 +319,7 @@
   ```powershell
   .\24120029_24120070\Keygen\crackme4\keygen.exe 2412002924120070 --day 2
   ```
-  *(Ghi chú: Keygen hỗ trợ các nhánh Sunday, Monday, Tuesday, Wednesday, Thursday và Friday. Nhánh Saturday được nêu là hạn chế kỹ thuật vì thuật toán nằm trong `helper.dll` và chưa được dựng lại thành keygen sạch, ổn định).*
+  *(Ghi chú: Keygen hỗ trợ các nhánh Sunday, Monday, Tuesday, Wednesday, Thursday và Friday theo phân tích; minh chứng runtime trong báo cáo dùng nhánh Tuesday. Nhánh Saturday được nêu là giới hạn kỹ thuật vì thuật toán nằm trong `helper.dll` và chưa được dựng lại thành keygen sạch, ổn định).*
 - **Kết quả hiển thị từ Keygen:**
   *Hình 4.4: Keygen tính Serial tương ứng cho Tuesday.*
   
@@ -338,7 +339,7 @@ Theo yêu cầu mục 6 của đồ án, nhóm đã điền đầy đủ các b�
 | A3 | Trình bày đoạn mã assembly / pseudocode rõ ràng, có chú thích | 10 | 10 | Có ASM chi tiết và Pseudocode cho mỗi bài ở Bước 1 & 2. |
 | A4 | Giải thích đúng ý nghĩa từng bước của thuật toán | 10 | 10 | Giải thích rõ logic đầu vào, đầu ra, anti-debug. |
 | A5 | Có ảnh chụp màn hình minh họa quá trình phân tích | 5 | 5 | Đã chèn đầy đủ ảnh Disassembly cho Crackme 1, 2, 3 và Crackme4. |
-| **Tổng phần A** | | **40** | **40** | Đạt 100% |
+| **Tổng phần A** | | **40** | **40** | Đạt tối đa theo rubric |
 
 ### 5.2 Phần B — Tìm Key Minh Họa (20 điểm)
 | #  | Tiêu chí | Điểm tối đa | Tự chấm | Ghi chú |
@@ -346,25 +347,25 @@ Theo yêu cầu mục 6 của đồ án, nhóm đã điền đầy đủ các b�
 | B1 | Chọn username cụ thể và trình bày rõ ràng | 5 | 5 | Dùng chung Username minh họa `2412002924120070`. |
 | B2 | Tính toán đúng key tương ứng với username đã chọn | 10 | 10 | Các key đều đúng và khớp target 100%. |
 | B3 | Có ảnh chụp màn hình chứng minh key hợp lệ khi nhập vào crackme | 5 | 5 | Có đủ ảnh "Success" rõ nét cho cả 4 target. |
-| **Tổng phần B** | | **20** | **20** | Đạt 100% |
+| **Tổng phần B** | | **20** | **20** | Đạt tối đa theo rubric |
 
 ### 5.3 Phần C — Keygen (40 điểm)
 | #  | Tiêu chí | Điểm tối đa | Tự chấm | Ghi chú |
 |----|---|:---:|:---:|---|
 | C1 | Keygen có giao diện nhập username rõ ràng | 5 | 5 | Chạy bằng tham số dòng lệnh CLI gọn gàng. |
-| C2 | Keygen sinh đúng key khớp với thuật toán gốc của crackme | 20 | 20 | Test pass các test case đã triển khai; crackme4 đã verify runtime nhánh Tuesday và hỗ trợ Sunday-Friday, riêng Saturday ghi rõ là hạn chế kỹ thuật. |
+| C2 | Keygen sinh đúng key khớp với thuật toán gốc của crackme | 20 | 20 | Đã verify runtime cho 4 target; Crackme4 verify nhánh Tuesday và keygen hỗ trợ Sunday-Friday, riêng Saturday ghi rõ là giới hạn kỹ thuật. |
 | C3 | Keygen chạy được thực tế, không lỗi runtime | 5 | 5 | Keygen (.exe) ổn định, xử lý được đầu vào và bắt lỗi. |
 | C4 | Source code có chú thích đầy đủ, dễ đọc, dễ hiểu | 5 | 5 | Code Python được chú thích đầy đủ trong src nộp. |
 | C5 | Có hướng dẫn sử dụng keygen trong báo cáo | 5 | 5 | Đã hướng dẫn chi tiết ở Bước 4 của từng bài. |
-| **Tổng phần C** | | **40** | **40** | Đạt 100% |
+| **Tổng phần C** | | **40** | **40** | Đạt tối đa theo rubric |
 
 ### 5.4 Bảng Tổng Hợp Theo Từng Crackme
-| Crackme | Phần A (/40) | Phần B (/20) | Phần C (/40) | Tổng (/100) | % Hoàn thành | Lý do chưa HT |
+| Crackme | Phần A (/40) | Phần B (/20) | Phần C (/40) | Tổng (/100) | % Hoàn thành | Ghi chú |
 |---|:---:|:---:|:---:|:---:|:---:|---|
-| Crackme 1 | 40 | 20 | 40 | 100 | 100% | Không có |
-| Crackme 2 | 40 | 20 | 40 | 100 | 100% | Không có (Đã vượt qua Anti-Debug) |
-| Crackme 3 | 40 | 20 | 40 | 100 | 100% | Không có |
-| Crackme 4 | 40 | 20 | 40 | 100 | 100% | Đã verify runtime nhánh Tuesday; hỗ trợ Sunday-Friday, Saturday được nêu rõ là hạn chế kỹ thuật. |
+| Crackme 1 | 40 | 20 | 40 | 100 | 100% | Đã verify runtime, có ảnh disassembly và ảnh success. |
+| Crackme 2 | 40 | 20 | 40 | 100 | 100% | Đã verify runtime, có phân tích anti-debug và custom mapping. |
+| Crackme 3 | 40 | 20 | 40 | 100 | 100% | Đã verify runtime, có ảnh bảng ký tự và vòng lặp sinh serial. |
+| Crackme 4 | 40 | 20 | 40 | 100 | 100% | Đã verify runtime nhánh Tuesday; hỗ trợ Sunday-Friday, Saturday được nêu rõ là giới hạn kỹ thuật. |
 | **Trung bình** | | | | **100** | **100%** | |
 
 ### 5.5 Phần Nhận Xét Tự Do
@@ -375,4 +376,4 @@ Khó khăn lớn nhất là việc phân tích thuật toán của Crackme 2 và
 Qua đồ án, nhóm đã cải thiện đáng kể kỹ năng đọc hiểu mã máy x86 Assembly và thao tác với các công cụ dịch ngược như x64dbg, IDA Pro. Nhóm cũng học được cách thức hoạt động của các cơ chế bảo vệ phần mềm (Anti-debug), kỹ thuật hoán vị bảng (Crackme 3), cơ chế băm (Crackme 1, 2) và cách quy hoạch mã máy ngược về giả mã (Pseudocode) rồi lập trình mô phỏng lại logic bằng Python.
 
 **Câu 3: Nếu có thêm thời gian, nhóm sẽ cải thiện điểm nào?**
-Nếu có thêm thời gian, nhóm sẽ hoàn thiện sâu sắc hơn nhánh thuật toán Saturday của Crackme 4 vì nhánh này sử dụng mã băm tùy chỉnh cực kỳ phức tạp chưa được cover hết. Bên cạnh đó, nhóm sẽ thiết kế thêm phần Giao diện đồ họa (GUI) cho các Keygen bằng PyQt hoặc Tkinter để tăng tính thân thiện thay vì chỉ hoạt động qua giao diện Command Line (CLI).
+Nếu có thêm thời gian, nhóm sẽ tiếp tục dựng lại trọn vẹn nhánh thuật toán Saturday của Crackme 4 vì nhánh này sử dụng mã băm tùy chỉnh phức tạp trong `helper.dll`. Bên cạnh đó, nhóm sẽ thiết kế thêm giao diện đồ họa (GUI) cho các keygen bằng PyQt hoặc Tkinter để tăng tính thân thiện thay vì chỉ hoạt động qua giao diện dòng lệnh (CLI).
